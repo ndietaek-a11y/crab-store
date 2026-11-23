@@ -1,0 +1,4402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="대게킹크랩" />
+<meta name="theme-color" content="#f43f5e" />
+<link id="appleTouchIcon" rel="apple-touch-icon" sizes="180x180" href="" />
+<link id="faviconIcon" rel="icon" type="image/png" href="" />
+<title>대게 · 킹크랩 매장 통합 관리 시스템</title>
+<style>
+  :root {
+    --bg: #f1f5f9;
+    --surface: #ffffff;
+    --surface-subtle: #f8fafc;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-sub: #475569;
+    --text-muted: #64748b;
+
+    /* 가격수정 컬러 */
+    --snow-accent: #e11d48;
+    --snow-bg: #fff1f2;
+    --snow-border: #fecdd3;
+    --snow-text: #be123c;
+
+    --king-accent: #ea580c;
+    --king-bg: #fff7ed;
+    --king-border: #fed7aa;
+    --king-text: #c2410c;
+
+    --baemin-bg: #ecfeff;
+    --baemin-text: #0e7490;
+    --baemin-hover: #cffafe;
+
+    --coupang-bg: #eff6ff;
+    --coupang-text: #1d4ed8;
+    --coupang-hover: #dbeafe;
+
+    /* 마진/장부 컬러 */
+    --cp: #2563eb;
+    --cp-bg: #eff6ff;
+    --bm: #0d9488;
+    --bm-bg: #f0fdfa;
+    --cost: #f59e0b;
+    --fee: #ef4444;
+    --profit: #10b981;
+
+    --buy: #2563eb;
+    --buy-bg: #eff6ff;
+    --pay: #059669;
+    --pay-bg: #ecfdf5;
+    --debt: #dc2626;
+    --debt-bg: #fef2f2;
+
+    --snow-blue: #2563eb;
+    --king-orange: #ea580c;
+    --up: #059669;
+    --down: #dc2626;
+    --prev: #cbd5e1;
+
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 6px 20px rgba(15, 23, 42, 0.05);
+    --shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.18);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Netlify 하단 배지/위젯 CSS 차단 */
+  iframe[src*="netlify"],
+  div[data-netlify-deploy-id],
+  a[href*="netlify.com"][style*="fixed"],
+  [id*="netlify"],
+  [class*="netlify"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+    touch-action: pan-y;
+  }
+
+  body {
+    font-family: "Pretendard Variable", "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.48;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  input, button, select {
+    font-family: inherit;
+    touch-action: manipulation;
+  }
+
+  /* ==================== 1. 관리자 비밀번호 잠금 화면 ==================== */
+  .lock-screen {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #0f172a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 9999;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+
+  .lock-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .lock-card {
+    width: 100%;
+    max-width: 400px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 32px 28px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+    text-align: center;
+  }
+
+  .lock-card.shake {
+    animation: shakeBox 0.38s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  @keyframes shakeBox {
+    10%, 90% { transform: translateX(-4px); }
+    20%, 80% { transform: translateX(6px); }
+    30%, 50%, 70% { transform: translateX(-8px); }
+    40%, 60% { transform: translateX(8px); }
+  }
+
+  .lock-badge {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #f43f5e 0%, #f97316 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 24px rgba(244, 63, 94, 0.3);
+  }
+
+  .lock-title {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #0f172a;
+  }
+
+  .lock-desc {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 6px;
+    margin-bottom: 22px;
+  }
+
+  .lock-input-group {
+    position: relative;
+    margin-bottom: 12px;
+  }
+
+  .lock-input {
+    width: 100%;
+    padding: 13px 44px 13px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 13px;
+    font-size: 17px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 2px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .lock-input:focus {
+    border-color: #f43f5e;
+    box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.12);
+  }
+
+  .lock-toggle-vis {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+  }
+
+  .lock-error {
+    min-height: 20px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 10px;
+  }
+
+  .lock-submit {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 13px;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .lock-submit:hover {
+    background: #1e293b;
+  }
+
+  .lock-submit:active {
+    transform: scale(0.99);
+  }
+
+  /* ==================== 2. 상단 고정 통합 네비게이션 ==================== */
+  .global-header {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  }
+
+  .global-header-inner {
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .store-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .store-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f43f5e 0%, #f97316 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .store-name {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .sync-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+  }
+
+  .sync-badge.saving {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #bfdbfe;
+  }
+
+  .sync-badge.offline {
+    background: #fef3c7;
+    color: #b45309;
+    border-color: #fde68a;
+  }
+
+  .sync-pulse {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .nav-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 12px;
+  }
+
+  .nav-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-sub);
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .nav-tab:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  .nav-tab.active {
+    background: #ffffff;
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+  }
+
+  .tab-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pwd-change-btn, .lock-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid var(--border);
+    background: #ffffff;
+    color: var(--text-sub);
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 7px 11px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .pwd-change-btn:hover, .lock-btn:hover {
+    background: var(--surface-subtle);
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+
+  .tab-panel {
+    display: none;
+    overflow-anchor: none;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  /* ==================== TAB 1: 배달가격수정 스타일 ==================== */
+  .p-shell {
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 18px 22px 36px;
+  }
+
+  .p-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 20px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .p-title { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+  .p-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 13px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn:hover { background: var(--surface-subtle); border-color: var(--border-strong); }
+  .btn-primary { background: #111827; color: #ffffff; border-color: #111827; }
+  .btn-primary:hover { background: #1f2937; }
+  .btn-danger-ghost { color: #dc2626; border-color: #fecaca; background: #fef2f2; }
+  .btn-danger-ghost:hover { background: #fee2e2; }
+
+  .p-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    align-items: start;
+  }
+
+  @media (max-width: 1040px) {
+    .p-cards-grid { grid-template-columns: 1fr; }
+  }
+
+  .p-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  .p-card-header {
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .p-card-header.snow { background: linear-gradient(180deg, #fff5f6 0%, #ffffff 100%); }
+  .p-card-header.king { background: linear-gradient(180deg, #fff8f1 0%, #ffffff 100%); }
+
+  .p-card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .p-card-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .p-cat-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .p-cat-badge.snow { background: var(--snow-bg); color: var(--snow-accent); border: 1px solid var(--snow-border); }
+  .p-cat-badge.king { background: var(--king-bg); color: var(--king-accent); border: 1px solid var(--king-border); }
+
+  .p-bulk-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .p-chip-btn {
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #ffffff;
+    color: var(--text-sub);
+    cursor: pointer;
+  }
+  .p-chip-btn:hover { background: var(--surface-subtle); color: var(--text); }
+  .p-chip-btn.baemin { color: var(--baemin-text); background: var(--baemin-bg); border-color: #a5f3fc; }
+  .p-chip-btn.coupang { color: var(--coupang-text); background: var(--coupang-bg); border-color: #bfdbfe; }
+
+  .p-price-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 10px 12px;
+  }
+
+  .p-price-input-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .p-price-field-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .p-price-input {
+    width: 130px;
+    padding: 7px 28px 7px 11px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 9px;
+    font-size: 16px;
+    font-weight: 800;
+    text-align: right;
+    color: var(--text);
+    background: #ffffff;
+    outline: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .p-price-unit {
+    position: absolute;
+    right: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .p-step-btns {
+    display: flex;
+    gap: 5px;
+  }
+
+  .p-step-btn {
+    border: 1px solid var(--border);
+    background: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 9px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .p-step-btn:hover { background: #f1f5f9; }
+  .p-step-btn.plus { color: #e11d48; }
+  .p-step-btn.minus { color: #2563eb; }
+
+  .p-table-wrap {
+    padding: 8px 14px 12px;
+    overflow-x: auto;
+  }
+
+  .p-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+  }
+
+  .p-table thead th {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-sub);
+    text-align: left;
+    padding: 6px 8px 4px;
+    background: transparent;
+    border: none;
+  }
+
+  .p-table thead th.num { text-align: right; }
+  .p-table thead th.center { text-align: center; }
+
+  .p-table tbody tr {
+    background: var(--surface-subtle);
+    transition: background 0.12s ease;
+  }
+
+  .p-table tbody tr:hover { background: #f1f5f9; }
+
+  .p-table tbody td {
+    padding: 6px 6px;
+    vertical-align: middle;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .p-table tbody td:first-child {
+    border-left: 1px solid var(--border);
+    border-radius: 10px 0 0 10px;
+    padding-left: 8px;
+  }
+
+  .p-table tbody td:last-child {
+    border-right: 1px solid var(--border);
+    border-radius: 0 10px 10px 0;
+    padding-right: 8px;
+  }
+
+  .p-weight-cell {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .p-weight-input {
+    width: 58px;
+    height: 34px;
+    padding: 0 6px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 13.5px;
+    font-weight: 800;
+    text-align: center;
+    color: var(--text);
+    outline: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .p-option-wrap {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .p-option-copy-btn {
+    flex: 1;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: #ffffff;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    white-space: nowrap;
+  }
+
+  .p-option-copy-btn:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+  }
+
+  .custom-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #8b5cf6;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  .p-icon-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #94a3b8;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .p-icon-btn:hover {
+    background: #ffffff;
+    border-color: var(--border);
+    color: var(--text);
+  }
+
+  .p-icon-btn.del:hover {
+    color: #dc2626;
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
+
+  .p-price-copy-btn {
+    width: 100%;
+    min-width: 92px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .p-price-copy-btn.baemin {
+    background: var(--baemin-bg);
+    color: var(--baemin-text);
+  }
+  .p-price-copy-btn.baemin:hover {
+    background: var(--baemin-hover);
+    border-color: #67e8f9;
+  }
+
+  .p-price-copy-btn.coupang {
+    background: var(--coupang-bg);
+    color: var(--coupang-text);
+  }
+  .p-price-copy-btn.coupang:hover {
+    background: var(--coupang-hover);
+    border-color: #93c5fd;
+  }
+
+  .p-price-main {
+    font-size: 13.5px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .copied-flash {
+    animation: popFlash 0.35s ease;
+  }
+
+  @keyframes popFlash {
+    0% { transform: scale(1); }
+    40% { transform: scale(0.96); }
+    100% { transform: scale(1); }
+  }
+
+  .p-card-footer {
+    padding: 0 14px 14px;
+  }
+
+  .p-add-row-btn {
+    width: 100%;
+    padding: 9px;
+    border-radius: 10px;
+    border: 1.5px dashed var(--border-strong);
+    background: transparent;
+    color: var(--text-sub);
+    font-size: 12.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+
+  .p-add-row-btn:hover {
+    background: var(--surface-subtle);
+    color: var(--text);
+  }
+
+  /* ==================== TAB 2: 마진계산 스타일 ==================== */
+  .m-container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 22px 18px 44px;
+  }
+
+  .m-header { margin-bottom: 18px; }
+  .m-header h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .m-header p { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+
+  .m-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .m-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: #1e293b;
+  }
+
+  .m-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .m-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
+
+  @media (max-width: 640px) {
+    .m-grid-3, .m-grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .m-field label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 6px;
+  }
+  .m-field.cp label { color: var(--cp); }
+  .m-field.bm label { color: var(--bm); }
+
+  .m-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .m-input-wrap input {
+    width: 100%;
+    padding: 10px 32px 10px 12px;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: right;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: #f8fafc;
+    color: var(--text);
+    outline: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .m-input-wrap input:focus {
+    border-color: #3b82f6;
+    background: #ffffff;
+  }
+  .m-input-wrap .unit {
+    position: absolute;
+    right: 11px;
+    font-size: 13px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .m-accordion-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #334155;
+    cursor: pointer;
+    padding: 2px 0;
+  }
+
+  .m-accordion-body {
+    display: none;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .m-accordion-body.open {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .m-accordion-body.open { grid-template-columns: 1fr; }
+  }
+
+  .m-setting-box {
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid var(--border);
+  }
+  .m-setting-box.cp { background: var(--cp-bg); border-color: #bfdbfe; }
+  .m-setting-box.bm { background: var(--bm-bg); border-color: #99f6e4; }
+  .m-setting-box h4 { font-size: 13.5px; font-weight: 700; margin-bottom: 10px; }
+  .m-setting-box.cp h4 { color: var(--cp); }
+  .m-setting-box.bm h4 { color: var(--bm); }
+  .m-setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 12.5px;
+    color: #334155;
+  }
+  .m-setting-row:last-child { margin-bottom: 0; }
+  .m-setting-row input {
+    width: 88px;
+    padding: 6px 8px;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+  }
+
+  .m-banner {
+    border-radius: 14px;
+    padding: 15px 18px;
+    margin-bottom: 14px;
+    text-align: center;
+    font-size: 15.5px;
+    font-weight: 800;
+    border: 1px solid transparent;
+  }
+  .m-banner.bm { background: var(--bm-bg); color: #0f766e; border-color: #99f6e4; }
+  .m-banner.cp { background: var(--cp-bg); color: #1d4ed8; border-color: #bfdbfe; }
+  .m-banner.tie { background: #f8fafc; color: #475569; border-color: var(--border); }
+
+  .m-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .legend { display: flex; gap: 12px; font-size: 12px; color: #475569; font-weight: 600; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  .m-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .m-bar-row:last-child { margin-bottom: 0; }
+  .m-bar-label { width: 72px; font-size: 13px; font-weight: 700; color: #1e293b; flex-shrink: 0; }
+  .m-bar-track {
+    flex: 1;
+    height: 30px;
+    background: #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+  }
+  .m-bar-seg {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: width 0.25s ease;
+  }
+
+  .std-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .std-table th, .std-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
+  .std-table th { background: #f8fafc; font-weight: 700; color: #475569; text-align: right; }
+  .std-table th:first-child, .std-table td:first-child { text-align: left; }
+  .std-table th.cp-col { color: var(--cp); }
+  .std-table th.bm-col { color: var(--bm); }
+  .std-table td { text-align: right; font-variant-numeric: tabular-nums; }
+  .std-table tr.row-sub { background: #f8fafc; font-weight: 700; }
+  .std-table tr.row-profit { background: #ecfdf5; font-weight: 800; font-size: 14.5px; }
+  .std-table tr.row-costrate { background: #fffbeb; font-weight: 700; }
+  .std-table tr.row-margin { background: #eff6ff; font-weight: 700; }
+  .neg { color: #dc2626; }
+  .pos { color: #059669; }
+
+  /* ==================== TAB 3 & 4: 매입입금관리 & 연간총판매 공통 스타일 ==================== */
+  .l-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 22px 18px 44px;
+  }
+
+  .l-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .l-title-wrap h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .l-title-wrap p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .l-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  .year-picker {
+    display: inline-flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 2px 4px;
+    gap: 2px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+  }
+  .year-picker select {
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f172a;
+    padding: 4px 6px;
+    outline: none;
+    cursor: pointer;
+  }
+  .wheel-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .wheel-btn {
+    border: none;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 9px;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 800;
+  }
+  .wheel-btn:hover { background: #e2e8f0; }
+
+  .l-btn {
+    border: 1px solid var(--border);
+    background: #ffffff;
+    color: #334155;
+    padding: 7px 12px;
+    border-radius: 9px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .l-btn:hover { background: #f8fafc; }
+  .l-btn-add { background: #0f172a; color: #fff; border-color: #0f172a; }
+  .l-btn-add:hover { background: #1e293b; }
+  .l-btn-del { color: var(--debt); border-color: #fecaca; background: #fef2f2; }
+  .l-btn-del:hover { background: #fee2e2; }
+  .l-btn-primary { background: var(--buy); color: #fff; border-color: var(--buy); }
+  .l-btn-primary:hover { background: #1d4ed8; }
+  .l-btn-pay { background: var(--pay); color: #fff; border-color: var(--pay); }
+  .l-btn-pay:hover { background: #047857; }
+
+  .l-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+  .l-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .l-card-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+
+  /* 매입입금 KPI */
+  .kpi-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .kpi-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow-sm);
+  }
+  .kpi-label { font-size: 12.5px; font-weight: 700; color: var(--text-muted); }
+  .kpi-val { font-size: 22px; font-weight: 800; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi-sub { font-size: 12px; font-weight: 700; margin-top: 5px; color: var(--text-muted); }
+  .kpi.buy .kpi-val { color: var(--buy); }
+  .kpi.pay .kpi-val { color: var(--pay); }
+  .kpi.debt .kpi-val { color: var(--debt); }
+  .kpi.snow .kpi-val { color: var(--snow-blue); }
+  .kpi.king .kpi-val { color: var(--king-orange); }
+
+  .add-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .add-box {
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid var(--border);
+  }
+  .add-box.buy { background: var(--buy-bg); border-color: #bfdbfe; }
+  .add-box.pay { background: var(--pay-bg); border-color: #a7f3d0; }
+  .add-box h3 { font-size: 13.5px; font-weight: 800; margin-bottom: 10px; }
+  .add-box.buy h3 { color: var(--buy); }
+  .add-box.pay h3 { color: var(--pay); }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 74px 72px 1fr auto;
+    gap: 8px;
+    align-items: center;
+  }
+  .form-row select, .form-row input {
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #ffffff;
+    outline: none;
+    width: 100%;
+  }
+  .form-row input[type="number"] { text-align: right; }
+
+  .chart-wrap { width: 100%; overflow: hidden; }
+  .bars {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 8px;
+    align-items: end;
+    height: 165px;
+    padding-top: 12px;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+  }
+  .bar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+    cursor: pointer;
+    padding: 4px 2px;
+    border-radius: 6px;
+    min-width: 0;
+  }
+  .bar-col:hover { background: #f8fafc; }
+  .bar-col.active { background: #eff6ff; }
+  .bar-pair {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 118px;
+    max-height: 118px;
+    width: 100%;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .bar {
+    width: 12px;
+    border-radius: 4px 4px 0 0;
+    min-height: 2px;
+    max-height: 100%;
+    transition: height 0.25s ease;
+  }
+  .bar.buy { background: var(--buy); }
+  .bar.pay { background: var(--pay); }
+  .bar-m {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #475569;
+    margin-top: 6px;
+    line-height: 1.2;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* 연간총판매 스택 차트 */
+  .bar-group {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 118px;
+    max-height: 118px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .stack {
+    width: 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
+  }
+  .seg-snow { background: var(--snow-blue); transition: height 0.25s ease; }
+  .seg-king { background: var(--king-orange); transition: height 0.25s ease; }
+  .bar-prev {
+    width: 12px;
+    background: var(--prev);
+    border-radius: 4px 4px 0 0;
+    max-height: 100%;
+    transition: height 0.25s ease;
+  }
+
+  .l-table-wrap { overflow-x: auto; }
+  .l-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .l-table th, .l-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .l-table th { background: #f8fafc; color: #475569; font-weight: 700; }
+  .l-table th:first-child, .l-table td:first-child { text-align: left; }
+  .l-table tbody tr.clickable { cursor: pointer; }
+  .l-table tbody tr.clickable:hover { background: #f8fafc; }
+  .l-table tbody tr.selected { background: #eff6ff; font-weight: 700; }
+
+  .c-buy { color: var(--buy); font-weight: 600; }
+  .c-pay { color: var(--pay); font-weight: 700; }
+  .c-debt { color: var(--debt); font-weight: 700; }
+  .c-snow { color: var(--snow-blue); font-weight: 700; }
+  .c-king { color: var(--king-orange); font-weight: 700; }
+  .up { color: var(--up); }
+  .down { color: var(--down); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 18px;
+    align-items: start;
+  }
+  .divider { background: var(--border); height: 100%; min-height: 120px; }
+  .detail-subhead {
+    font-size: 13.5px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .detail-table th, .detail-table td { padding: 8px 10px; }
+  .detail-table td.edit-cell, .daily-table td.edit-cell { cursor: pointer; border-radius: 6px; }
+  .detail-table td.edit-cell:hover, .daily-table td.edit-cell:hover { background: #f1f5f9; }
+  .del-btn {
+    border: none;
+    background: none;
+    color: #94a3b8;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 2px 6px;
+  }
+  .del-btn:hover { color: var(--debt); }
+
+  /* 월별 빠른 선택 버튼 그리드 */
+  .month-pill-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 6px;
+  }
+  .month-pill-btn {
+    padding: 8px 4px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .month-pill-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+  .month-pill-btn.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  }
+
+  /* 일별 판매량 입력칸 가림막(Placeholder) & 경계선 시인성 강화 */
+  .sales-input-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .sales-input-box input {
+    padding: 10px 38px 10px 12px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    background: #f1f5f9;
+    color: #0f172a;
+    outline: none;
+    width: 100%;
+    text-align: right;
+    transition: all 0.15s ease;
+  }
+  .sales-input-box.snow input {
+    background: #eff6ff;
+    border-color: #93c5fd;
+  }
+  .sales-input-box.snow input:focus {
+    background: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+  }
+  .sales-input-box.king input {
+    background: #fff7ed;
+    border-color: #fdba74;
+  }
+  .sales-input-box.king input:focus {
+    background: #ffffff;
+    border-color: #ea580c;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.14);
+  }
+  .sales-input-box input::placeholder {
+    color: #64748b;
+    font-weight: 600;
+    opacity: 1;
+  }
+  .sales-input-unit {
+    position: absolute;
+    right: 12px;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #475569;
+    pointer-events: none;
+  }
+
+  .quick-form {
+    display: grid;
+    grid-template-columns: 95px 95px 1fr 1fr auto;
+    gap: 10px;
+    align-items: center;
+  }
+  .quick-form select {
+    padding: 10px 11px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+    background: #f8fafc;
+    outline: none;
+    width: 100%;
+  }
+  .quick-form select:focus {
+    border-color: var(--snow-blue);
+    background: #ffffff;
+  }
+
+  .daily-cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .daily-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 4px;
+    font-size: 13px;
+  }
+  .daily-table th, .daily-table td {
+    padding: 7px 9px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .daily-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+  .daily-table th:first-child, .daily-table td:first-child { text-align: center; }
+  .day-cell { font-weight: 700; color: #475569; width: 48px; }
+  .daily-table td.edit-cell {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+    min-height: 32px;
+  }
+  .daily-table td.edit-cell.empty-slot::after {
+    content: "입력";
+    color: #cbd5e1;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .daily-table td.edit-cell:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+  }
+
+  @media (max-width: 860px) {
+    .kpi-grid-3, .kpi-grid-2, .add-grid, .detail-grid, .daily-cols { grid-template-columns: 1fr; }
+    .divider { display: none; }
+    .quick-form { grid-template-columns: 1fr 1fr; }
+    .month-pill-grid { grid-template-columns: repeat(6, 1fr); }
+  }
+
+  /* ==================== 모바일 전용 UI 최적화 (768px 이하) ==================== */
+  @media (max-width: 768px) {
+    .global-header-inner {
+      padding: 8px 12px;
+      gap: 8px;
+    }
+
+    .store-brand {
+      flex: 1;
+      min-width: 0;
+      gap: 6px;
+    }
+
+    .store-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+    }
+
+    .store-name {
+      font-size: 13.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sync-badge {
+      padding: 3px 7px;
+      font-size: 10.5px;
+    }
+
+    .header-right {
+      gap: 5px;
+    }
+
+    .pwd-change-btn, .lock-btn {
+      padding: 6px 8px;
+      font-size: 11.5px;
+    }
+
+    .nav-tabs {
+      order: 3;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3px;
+      padding: 3px;
+    }
+
+    .nav-tab {
+      justify-content: center;
+      padding: 8px 2px;
+      font-size: 12px;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .tab-dot {
+      width: 6px;
+      height: 6px;
+    }
+
+    .p-shell {
+      padding: 12px 10px 30px;
+    }
+
+    .p-topbar {
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+
+    .p-title {
+      font-size: 16px;
+    }
+
+    .p-sub {
+      font-size: 11.5px;
+    }
+
+    .p-card-header {
+      padding: 13px 14px 12px;
+    }
+
+    .p-bulk-group {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+    }
+
+    .p-chip-btn {
+      text-align: center;
+      padding: 7px 4px;
+      font-size: 11.5px;
+    }
+
+    .p-price-control {
+      padding: 9px 10px;
+    }
+
+    .p-price-input-box {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .p-price-input {
+      width: 145px;
+      font-size: 16px;
+    }
+
+    .p-step-btns {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+
+    .p-step-btn {
+      padding: 8px 4px;
+      font-size: 12px;
+    }
+
+    .p-table-wrap {
+      padding: 8px 10px 10px;
+      overflow-x: visible;
+    }
+
+    .p-table thead {
+      display: none;
+    }
+
+    .p-table, .p-table tbody {
+      display: block;
+      width: 100%;
+    }
+
+    .p-table tbody tr {
+      display: grid;
+      grid-template-columns: 74px 1fr 32px;
+      grid-template-areas:
+        "weight option del"
+        "prices prices prices";
+      gap: 7px 6px;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-subtle);
+    }
+
+    .p-table tbody td {
+      display: block;
+      width: 100% !important;
+      padding: 0 !important;
+      border: none !important;
+      border-radius: 0 !important;
+    }
+
+    .p-table tbody td:nth-child(1) { grid-area: weight; }
+    .p-table tbody td:nth-child(2) { grid-area: option; min-width: 0; }
+    .p-table tbody td:nth-child(5) { grid-area: del; text-align: right; }
+
+    .p-table tbody td:nth-child(3),
+    .p-table tbody td:nth-child(4) {
+      grid-area: prices;
+      width: calc(50% - 3px) !important;
+    }
+
+    .p-table tbody td:nth-child(3) {
+      justify-self: start;
+    }
+
+    .p-table tbody td:nth-child(4) {
+      justify-self: end;
+    }
+
+    .p-weight-input {
+      width: 50px;
+      height: 36px;
+      font-size: 13px;
+    }
+
+    .p-option-copy-btn {
+      height: 36px;
+      padding: 0 8px;
+      font-size: 12.5px;
+      overflow: hidden;
+    }
+
+    .p-option-copy-btn span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .p-price-copy-btn {
+      min-width: 0;
+      height: 38px;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+
+    .p-price-copy-btn.baemin::before {
+      content: "배민";
+      font-size: 11px;
+      font-weight: 700;
+      opacity: 0.78;
+    }
+
+    .p-price-copy-btn.coupang::before {
+      content: "쿠팡";
+      font-size: 11px;
+      font-weight: 700;
+      opacity: 0.78;
+    }
+
+    .m-container, .l-container {
+      padding: 14px 10px 32px;
+    }
+
+    .m-card, .l-card {
+      padding: 14px 12px;
+      border-radius: 14px;
+    }
+
+    .l-topbar {
+      gap: 10px;
+    }
+
+    .l-title-wrap h2, .m-header h2 {
+      font-size: 18px;
+    }
+
+    .l-controls {
+      width: 100%;
+    }
+
+    .l-controls .l-btn {
+      padding: 7px 9px;
+      font-size: 12px;
+    }
+
+    .kpi-grid-3 {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .kpi-grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .kpi {
+      padding: 12px 14px;
+    }
+
+    .kpi-val {
+      font-size: 18px;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .form-row input[type="number"] {
+      grid-column: 1 / 2;
+    }
+
+    .form-row button {
+      grid-column: 2 / 3;
+      padding: 8px;
+    }
+
+    .quick-form {
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .quick-form button {
+      grid-column: 1 / -1;
+      padding: 10px;
+    }
+
+    .std-table th, .std-table td {
+      padding: 8px 6px;
+      font-size: 12.5px;
+    }
+
+    .l-table th, .l-table td {
+      padding: 7px 6px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .bars {
+      min-width: 0;
+      width: 100%;
+      gap: 2px;
+      height: 145px;
+    }
+
+    .bar-pair, .bar-group {
+      height: 104px;
+      max-height: 104px;
+    }
+
+    .bar-pair {
+      gap: 1.5px;
+    }
+
+    .bar {
+      width: 6px;
+    }
+
+    .bar-group {
+      gap: 2px;
+    }
+
+    .stack {
+      width: 8px;
+    }
+
+    .bar-prev {
+      width: 6px;
+    }
+
+    .bar-m {
+      font-size: 10px;
+    }
+
+    .chart-wrap {
+      overflow: hidden;
+      touch-action: pan-y;
+    }
+
+    .l-table-wrap, .p-table-wrap {
+      touch-action: pan-y;
+    }
+
+    .modal-backdrop {
+      padding: 10px;
+      touch-action: none;
+    }
+
+    .modal {
+      touch-action: pan-y;
+    }
+
+    .modal-header, .modal-body, .modal-footer {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    .preset-chips {
+      margin-left: 0;
+      width: 100%;
+    }
+  }
+
+  /* ==================== 범용 커스텀 모달 & 토스트 ==================== */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.48);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 2000;
+  }
+
+  .modal-backdrop.open {
+    display: flex;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 680px;
+    max-height: 86vh;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalIn 0.16s ease-out;
+  }
+
+  .modal.sm-modal {
+    max-width: 410px;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .modal-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title { font-size: 16.5px; font-weight: 800; }
+  .modal-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; }
+
+  .modal-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 12px 22px 0;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface-subtle);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-sub);
+    cursor: pointer;
+  }
+
+  .tab-btn.active.snow {
+    background: var(--snow-bg);
+    border-color: var(--snow-border);
+    color: var(--snow-text);
+  }
+
+  .tab-btn.active.king {
+    background: var(--king-bg);
+    border-color: var(--king-border);
+    color: var(--king-text);
+  }
+
+  .modal-body {
+    padding: 14px 22px 18px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .edit-row-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 11px 13px;
+    background: var(--surface-subtle);
+  }
+
+  .edit-row-card.highlight {
+    border-color: #111827;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  }
+
+  .edit-row-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .edit-weight-pill {
+    min-width: 62px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 5px 8px;
+    border-radius: 8px;
+    background: #ffffff;
+    border: 1px solid var(--border-strong);
+  }
+
+  .count-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .count-input {
+    width: 78px;
+    padding: 6px 8px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 13.5px;
+    font-weight: 800;
+    text-align: center;
+    outline: none;
+  }
+
+  .preset-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-left: auto;
+  }
+
+  .preset-chip {
+    padding: 4px 8px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: #ffffff;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-sub);
+    cursor: pointer;
+  }
+
+  .preset-chip.active {
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
+  }
+
+  .edit-row-preview {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .preview-label-input {
+    flex: 1;
+    padding: 5px 9px;
+    border-radius: 7px;
+    border: 1px solid transparent;
+    background: transparent;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text);
+    outline: none;
+  }
+
+  .preview-label-input:focus {
+    background: #ffffff;
+    border-color: #8b5cf6;
+  }
+
+  .reset-label-btn {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd6fe;
+    background: #f5f3ff;
+    color: #6d28d9;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .modal-footer {
+    padding: 14px 22px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--surface-subtle);
+  }
+
+  .dialog-input {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    outline: none;
+  }
+
+  .dialog-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(16px);
+    background: rgba(15, 23, 42, 0.95);
+    color: #ffffff;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.25);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+  <!-- ==================== 1. 관리자 비밀번호 잠금 화면 ==================== -->
+  <div class="lock-screen" id="lockScreen">
+    <div class="lock-card" id="lockCard">
+      <div class="lock-badge">
+        <svg width="38" height="38" viewBox="0 0 64 64" fill="none">
+          <path d="M21 29C15 26 12 22 14 17" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+          <path d="M13 18C8 14 10 8 15 9L14 14L19 12C21 16 17 20 13 18Z" fill="#ffffff"/>
+          <path d="M43 29C49 26 52 22 50 17" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+          <path d="M51 18C56 14 54 8 49 9L50 14L45 12C43 16 47 20 51 18Z" fill="#ffffff"/>
+          <path d="M16 34C11 33 8 34 6 37" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round"/>
+          <path d="M16 39C11 40 8 42 7 45" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round"/>
+          <path d="M19 44C15 47 13 49 12 52" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round"/>
+          <path d="M48 34C53 33 56 34 58 37" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round"/>
+          <path d="M48 39C53 40 56 42 57 45" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round"/>
+          <path d="M45 44C49 47 51 49 52 52" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round"/>
+          <ellipse cx="32" cy="38" rx="17" ry="11.5" fill="#ffffff"/>
+        </svg>
+      </div>
+      <div class="lock-title">대게 · 킹크랩 매장 통합 관리</div>
+      <div class="lock-desc">관리자 비밀번호를 입력하면 시스템 잠금이 해제됩니다</div>
+      <form id="lockForm">
+        <div class="lock-input-group">
+          <input type="password" id="lockPwdInput" class="lock-input" placeholder="비밀번호 입력" autocomplete="off" autofocus />
+          <button type="button" class="lock-toggle-vis" id="togglePwdVis" title="비밀번호 보기/숨기기">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <div class="lock-error" id="lockError"></div>
+        <button type="submit" class="lock-submit">잠금 해제</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== 2. 상단 고정 통합 네비게이션 ==================== -->
+  <header class="global-header">
+    <div class="global-header-inner">
+      <div class="store-brand">
+        <div class="store-logo">
+          <svg width="24" height="24" viewBox="0 0 64 64" fill="none">
+            <path d="M21 29C15 26 12 22 14 17" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round"/>
+            <path d="M13 18C8 14 10 8 15 9L14 14L19 12C21 16 17 20 13 18Z" fill="#ffffff"/>
+            <path d="M43 29C49 26 52 22 50 17" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round"/>
+            <path d="M51 18C56 14 54 8 49 9L50 14L45 12C43 16 47 20 51 18Z" fill="#ffffff"/>
+            <path d="M16 34C11 33 8 34 6 37" stroke="#ffffff" stroke-width="3.8" stroke-linecap="round"/>
+            <path d="M16 39C11 40 8 42 7 45" stroke="#ffffff" stroke-width="3.8" stroke-linecap="round"/>
+            <path d="M19 44C15 47 13 49 12 52" stroke="#ffffff" stroke-width="3.8" stroke-linecap="round"/>
+            <path d="M48 34C53 33 56 34 58 37" stroke="#ffffff" stroke-width="3.8" stroke-linecap="round"/>
+            <path d="M48 39C53 40 56 42 57 45" stroke="#ffffff" stroke-width="3.8" stroke-linecap="round"/>
+            <path d="M45 44C49 47 51 49 52 52" stroke="#ffffff" stroke-width="3.8" stroke-linecap="round"/>
+            <ellipse cx="32" cy="38" rx="17" ry="11.5" fill="#ffffff"/>
+          </svg>
+        </div>
+        <span class="store-name">대게 · 킹크랩 매장 통합 관리</span>
+        <div class="sync-badge" id="syncBadge" title="포스기 · PC · 스마트폰 실시간 클라우드 동기화 상태">
+          <span class="sync-pulse"></span>
+          <span id="syncText">클라우드 연결 중...</span>
+        </div>
+      </div>
+
+      <nav class="nav-tabs" role="tablist">
+        <button class="nav-tab active" data-tab="sales" onclick="switchMainTab('sales')">
+          <span class="tab-dot" style="background:#ea580c;"></span>연간총판매
+        </button>
+        <button class="nav-tab" data-tab="ledger" onclick="switchMainTab('ledger')">
+          <span class="tab-dot" style="background:#2563eb;"></span>매입입금관리
+        </button>
+        <button class="nav-tab" data-tab="price" onclick="switchMainTab('price')">
+          <span class="tab-dot" style="background:#f43f5e;"></span>배달가격수정
+        </button>
+        <button class="nav-tab" data-tab="margin" onclick="switchMainTab('margin')">
+          <span class="tab-dot" style="background:#0d9488;"></span>마진계산
+        </button>
+      </nav>
+
+      <div class="header-right">
+        <button class="pwd-change-btn" onclick="openChangePwdModal()" title="관리자 비밀번호 변경">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+          </svg>
+          비밀번호 변경
+        </button>
+        <button class="lock-btn" onclick="lockApp()" title="화면 잠금">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          잠금
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== TAB 1: 배달가격수정 ==================== -->
+  <div class="tab-panel" id="panel-price">
+    <div class="p-shell">
+      <div class="p-topbar">
+        <div>
+          <div class="p-title">대게 · 킹크랩 가격수정 프로그램</div>
+          <div class="p-sub">싯가 입력 즉시 배민 · 쿠팡 옵션가 자동 계산 · 클릭 시 숫자/옵션명 바로 복사</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="openCountModal('snow', null)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+            </svg>
+            마릿수 수정
+          </button>
+          <button class="btn btn-danger-ghost" onclick="confirmAction('가격수정 설정을 기본값으로 초기화할까요?', '입력한 싯가, 중량, 마릿수 수정 내역이 초기 설정으로 돌아갑니다.', resetPriceState)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>
+            </svg>
+            초기화
+          </button>
+        </div>
+      </div>
+
+      <div class="p-cards-grid">
+        <section class="p-card" id="card-snow"></section>
+        <section class="p-card" id="card-king"></section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 2: 마진계산 ==================== -->
+  <div class="tab-panel" id="panel-margin">
+    <div class="m-container">
+      <div class="m-header">
+        <h2>배달 마진 계산기</h2>
+        <p>쿠팡이츠 vs 배달의민족 정산예정금액 · 원가율 · 순수익 실시간 비교</p>
+      </div>
+
+      <div class="m-card">
+        <div class="m-card-title">주문 및 원가 입력</div>
+        <div class="m-grid-3">
+          <div class="m-field">
+            <label>매출액</label>
+            <div class="m-input-wrap">
+              <input type="number" id="m_sales" value="105000" min="0" step="1000">
+              <span class="unit">원</span>
+            </div>
+          </div>
+          <div class="m-field">
+            <label>식자재 원가</label>
+            <div class="m-input-wrap">
+              <input type="number" id="m_cost" value="50000" min="0" step="1000">
+              <span class="unit">원</span>
+            </div>
+          </div>
+          <div class="m-field">
+            <label>포장비</label>
+            <div class="m-input-wrap">
+              <input type="number" id="m_packaging" value="2000" min="0" step="500">
+              <span class="unit">원</span>
+            </div>
+          </div>
+        </div>
+        <div class="m-grid-2">
+          <div class="m-field cp">
+            <label>쿠팡 쿠폰할인 (상점부담)</label>
+            <div class="m-input-wrap">
+              <input type="number" id="m_cpCoupon" value="0" min="0" step="500">
+              <span class="unit">원</span>
+            </div>
+          </div>
+          <div class="m-field bm">
+            <label>배민 쿠폰할인 (상점부담)</label>
+            <div class="m-input-wrap">
+              <input type="number" id="m_bmCoupon" value="0" min="0" step="500">
+              <span class="unit">원</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="m-card">
+        <button class="m-accordion-btn" id="m_toggleSettings">
+          <span>수수료율 및 배달비 상세 설정</span>
+          <span id="m_arrow">▼</span>
+        </button>
+        <div class="m-accordion-body" id="m_settingsBody">
+          <div class="m-setting-box cp">
+            <h4>쿠팡이츠</h4>
+            <div class="m-setting-row"><span>중개이용료 (%)</span><input type="number" id="m_cpBrokerage" value="7.8" step="0.1"></div>
+            <div class="m-setting-row"><span>결제수수료 (%)</span><input type="number" id="m_cpPg" value="3.0" step="0.05"></div>
+            <div class="m-setting-row"><span>배달비 (원)</span><input type="number" id="m_cpDelivery" value="3400" step="100"></div>
+          </div>
+          <div class="m-setting-box bm">
+            <h4>배달의민족</h4>
+            <div class="m-setting-row"><span>중개이용료 (%)</span><input type="number" id="m_bmBrokerage" value="6.8" step="0.1"></div>
+            <div class="m-setting-row"><span>결제수수료 (%)</span><input type="number" id="m_bmPg" value="1.55" step="0.05"></div>
+            <div class="m-setting-row"><span>배달비 (원)</span><input type="number" id="m_bmDelivery" value="2900" step="100"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="m-banner bm" id="m_banner"></div>
+
+      <div class="m-card">
+        <div class="m-chart-header">
+          <div class="m-card-title" style="margin-bottom:0;">매출 대비 비중</div>
+          <div class="legend">
+            <span><i class="dot" style="background:var(--cost)"></i>원가+포장비</span>
+            <span><i class="dot" style="background:var(--fee)"></i>수수료+할인+부가세</span>
+            <span><i class="dot" style="background:var(--profit)"></i>순수익</span>
+          </div>
+        </div>
+        <div class="m-bar-row">
+          <div class="m-bar-label">쿠팡이츠</div>
+          <div class="m-bar-track" id="m_cpBar"></div>
+        </div>
+        <div class="m-bar-row">
+          <div class="m-bar-label">배달의민족</div>
+          <div class="m-bar-track" id="m_bmBar"></div>
+        </div>
+      </div>
+
+      <div class="m-card">
+        <div class="m-card-title">상세 정산 내역 비교</div>
+        <table class="std-table">
+          <thead>
+            <tr>
+              <th>항목</th>
+              <th class="cp-col">쿠팡이츠</th>
+              <th class="bm-col">배달의민족</th>
+            </tr>
+          </thead>
+          <tbody id="m_resultTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 3: 매입입금관리 ==================== -->
+  <div class="tab-panel" id="panel-ledger">
+    <div class="l-container">
+      <div class="l-topbar">
+        <div class="l-title-wrap">
+          <h2>수산 매입·입금 관리대장</h2>
+          <p>대게 매입총액 · 입금액(+) · 월별/누적 미수금(-) · 전년도 자동 이월 및 비교</p>
+        </div>
+        <div class="l-controls">
+          <div class="year-picker" id="l_yearPicker" title="마우스 휠을 굴려 연도를 변경할 수 있습니다">
+            <select id="l_yearSelect"></select>
+            <div class="wheel-btns">
+              <button class="wheel-btn" id="l_yearUp" title="위 연도">▲</button>
+              <button class="wheel-btn" id="l_yearDown" title="아래 연도">▼</button>
+            </div>
+          </div>
+          <button class="l-btn l-btn-add" id="l_addYearBtn">+ 연도 추가</button>
+          <button class="l-btn l-btn-del" id="l_delYearBtn">- 연도 삭제</button>
+          <button class="l-btn" id="l_exportCsv">CSV 내보내기</button>
+          <button class="l-btn" id="l_resetData">원본 초기화</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid-3">
+        <div class="kpi buy">
+          <div class="kpi-label">연간 매입 총액 (당해 연도)</div>
+          <div class="kpi-val" id="l_kpiBuy">0원</div>
+          <div class="kpi-sub" id="l_kpiBuyDiff">전년 대비 -</div>
+        </div>
+        <div class="kpi pay">
+          <div class="kpi-label">연간 입금 총액 (+)</div>
+          <div class="kpi-val" id="l_kpiPay">+0원</div>
+          <div class="kpi-sub" id="l_kpiPayDiff">전년 대비 -</div>
+        </div>
+        <div class="kpi debt">
+          <div class="kpi-label">현재 누적 미수금 (-)</div>
+          <div class="kpi-val" id="l_kpiDebt">0원</div>
+          <div class="kpi-sub" id="l_kpiCarry">전년 이월 미수금: 0원</div>
+        </div>
+      </div>
+
+      <div class="l-card">
+        <div class="add-grid">
+          <div class="add-box buy">
+            <h3>+ 매입 거래 추가</h3>
+            <div class="form-row">
+              <select id="l_buyMonth"></select>
+              <input type="text" id="l_buyDay" placeholder="일자">
+              <input type="number" id="l_buyAmt" placeholder="매입액 (원)" min="0" step="10000">
+              <button class="l-btn l-btn-primary" id="l_addBuyBtn">추가</button>
+            </div>
+          </div>
+          <div class="add-box pay">
+            <h3>+ 입금 거래 추가</h3>
+            <div class="form-row">
+              <select id="l_payMonth"></select>
+              <input type="text" id="l_payDay" placeholder="일자">
+              <input type="number" id="l_payAmt" placeholder="입금액 (원)" min="0" step="10000">
+              <button class="l-btn l-btn-pay" id="l_addPayBtn">추가</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="l-card">
+        <div class="l-card-head">
+          <div class="l-card-title">월별 매입 vs 입금 추이</div>
+          <label style="font-size:12.5px; color:#475569; cursor:pointer; display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="l_excludeCarry" checked> 1월 전년 이월 내역 제외하고 보기
+          </label>
+        </div>
+        <div class="chart-wrap">
+          <div class="bars" id="l_chartBars"></div>
+        </div>
+      </div>
+
+      <div class="l-card">
+        <div class="l-card-head">
+          <div class="l-card-title" id="l_detailTitle">1월 상세 거래내역 (셀 클릭 시 수정 가능)</div>
+          <div style="font-size:12.5px; color:#64748b;">아래 월별 표에서 월을 클릭하면 해당 월 내역이 열립니다.</div>
+        </div>
+        <div class="detail-grid">
+          <div>
+            <div class="detail-subhead">
+              <span style="color:var(--buy)">매입 내역</span>
+              <span id="l_detailBuySum" class="c-buy">0원</span>
+            </div>
+            <table class="l-table detail-table">
+              <thead>
+                <tr><th style="width:78px;">일자</th><th>매입액</th><th style="width:36px;"></th></tr>
+              </thead>
+              <tbody id="l_detailBuyBody"></tbody>
+            </table>
+          </div>
+          <div class="divider"></div>
+          <div>
+            <div class="detail-subhead">
+              <span style="color:var(--pay)">입금 내역 (+)</span>
+              <span id="l_detailPaySum" class="c-pay">+0원</span>
+            </div>
+            <table class="l-table detail-table">
+              <thead>
+                <tr><th style="width:78px;">일자</th><th>입금액 (+)</th><th style="width:36px;"></th></tr>
+              </thead>
+              <tbody id="l_detailPayBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="l-card">
+        <div class="l-card-head">
+          <div class="l-card-title">월별 정산 요약 (전년 동월 비교 포함)</div>
+        </div>
+        <div class="l-table-wrap">
+          <table class="l-table">
+            <thead>
+              <tr>
+                <th>월</th>
+                <th>대게 매입총액</th>
+                <th>입금 총액 (+)</th>
+                <th>월별 미수금 (-)</th>
+                <th>누적 미수금 (-)</th>
+                <th>전년 동월 매입 대비</th>
+              </tr>
+            </thead>
+            <tbody id="l_summaryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 4: 연간총판매 ==================== -->
+  <div class="tab-panel active" id="panel-sales">
+    <div class="l-container">
+      <div class="l-topbar">
+        <div class="l-title-wrap">
+          <h2>연간 총 판매량 관리대장</h2>
+          <p>대게 · 킹크랩 일별 및 월별 판매량(kg) · 전년 동월 자동 비교</p>
+        </div>
+        <div class="l-controls">
+          <div class="year-picker" id="s_yearPicker" title="마우스 휠을 굴려 연도를 변경할 수 있습니다">
+            <select id="s_yearSelect"></select>
+            <div class="wheel-btns">
+              <button class="wheel-btn" id="s_yearUp" title="위 연도">▲</button>
+              <button class="wheel-btn" id="s_yearDown" title="아래 연도">▼</button>
+            </div>
+          </div>
+          <button class="l-btn l-btn-add" id="s_addYearBtn">+ 연도 추가</button>
+          <button class="l-btn l-btn-del" id="s_delYearBtn">- 연도 삭제</button>
+          <button class="l-btn" id="s_exportCsvBtn">CSV 내보내기</button>
+          <button class="l-btn" id="s_resetBtn">원본 초기화</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid-2">
+        <div class="kpi snow">
+          <div class="kpi-label">대게 총 판매량</div>
+          <div class="kpi-val" id="s_kpiSnow">0.00kg</div>
+          <div class="kpi-sub" id="s_kpiSnowShare">비중 0.0%</div>
+        </div>
+        <div class="kpi king">
+          <div class="kpi-label">킹크랩 총 판매량</div>
+          <div class="kpi-val" id="s_kpiKing">0.00kg</div>
+          <div class="kpi-sub" id="s_kpiKingShare">비중 0.0%</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">올해 총 판매량</div>
+          <div class="kpi-val" id="s_kpiTotal">0.00kg</div>
+          <div class="kpi-sub" id="s_kpiSamePeriod">작년 동기간 대비 -</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">작년 총 판매량</div>
+          <div class="kpi-val" id="s_kpiPrevTotal">0.00kg</div>
+          <div class="kpi-sub" id="s_kpiPrevDiff">작년 총 판매량 대비 -</div>
+        </div>
+      </div>
+
+      <div class="l-card">
+        <div class="l-card-head">
+          <div class="l-card-title">월 선택 (버튼을 눌러 해당 월 일별 장부 보기)</div>
+        </div>
+        <div class="month-pill-grid" id="s_monthPills"></div>
+      </div>
+
+      <div class="l-card">
+        <div class="l-card-head">
+          <div class="l-card-title">일별 판매량 입력 / 수정</div>
+        </div>
+        <div class="quick-form">
+          <select id="s_inMonth"></select>
+          <select id="s_inDay"></select>
+          <div class="sales-input-box snow">
+            <input type="number" id="s_inSnow" placeholder="대게 중량 입력" min="0" step="0.01">
+            <span class="sales-input-unit">kg</span>
+          </div>
+          <div class="sales-input-box king">
+            <input type="number" id="s_inKing" placeholder="킹크랩 중량 입력" min="0" step="0.01">
+            <span class="sales-input-unit">kg</span>
+          </div>
+          <button class="l-btn l-btn-primary" id="s_saveDayBtn">저장</button>
+        </div>
+      </div>
+
+      <div class="l-card">
+        <div class="l-card-head">
+          <div class="l-card-title">월별 판매량 추이 (대게 + 킹크랩 vs 작년 동월)</div>
+          <div class="legend">
+            <span><i class="dot" style="background:var(--snow-blue)"></i>대게</span>
+            <span><i class="dot" style="background:var(--king-orange)"></i>킹크랩</span>
+            <span><i class="dot" style="background:var(--prev)"></i>작년 동월</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <div class="bars" id="s_chartBars"></div>
+        </div>
+      </div>
+
+      <div class="l-card">
+        <div class="l-card-head">
+          <div class="l-card-title" id="s_dailyTitle">1월 일별 판매량 (셀 클릭 시 수정)</div>
+          <div style="font-size:12.5px; color:#64748b;" id="s_dailyNotice"></div>
+        </div>
+        <div class="daily-cols" id="s_dailyCols"></div>
+      </div>
+
+      <div class="l-card">
+        <div class="l-card-head">
+          <div class="l-card-title">월별 총 판매량 요약</div>
+        </div>
+        <div class="l-table-wrap">
+          <table class="l-table">
+            <thead>
+              <tr>
+                <th>월</th>
+                <th>대게</th>
+                <th>킹크랩</th>
+                <th>월 총 판매량</th>
+                <th>작년 동월</th>
+                <th>전년 대비 증감</th>
+              </tr>
+            </thead>
+            <tbody id="s_summaryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 마릿수 · 옵션명 수정 모달 ==================== -->
+  <div class="modal-backdrop" id="count-modal-backdrop" onclick="if(event.target===this) closeCountModal()">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">마릿수 · 옵션명 수정</div>
+          <div class="modal-sub">마릿수 숫자만 바꾸면 인분은 자동 유지됩니다 · 아래 옵션명을 직접 클릭해 자유롭게 수정할 수도 있어요</div>
+        </div>
+        <button class="p-icon-btn" onclick="closeCountModal()" title="닫기">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-tabs">
+        <button class="tab-btn snow" id="tab-snow" onclick="switchModalTab('snow')">대게</button>
+        <button class="tab-btn king" id="tab-king" onclick="switchModalTab('king')">킹크랩</button>
+      </div>
+      <div class="modal-body" id="count-modal-body"></div>
+      <div class="modal-footer">
+        <div style="font-size:12px; color:#64748b;">Enter 키로 다음 행 이동 · 변경 즉시 클라우드 저장</div>
+        <button class="btn btn-primary" onclick="closeCountModal()">완료</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 범용 확인/입력 다이얼로그 모달 ==================== -->
+  <div class="modal-backdrop" id="custom-dialog-backdrop" onclick="if(event.target===this) closeCustomDialog()">
+    <div class="modal sm-modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="dialogTitle">확인</div>
+          <div class="modal-sub" id="dialogDesc"></div>
+        </div>
+      </div>
+      <div class="modal-body" id="dialogInputWrap" style="display:none; padding-top:14px; padding-bottom:14px;">
+        <input type="text" id="dialogInput" class="dialog-input" />
+      </div>
+      <div class="modal-footer" style="justify-content:flex-end;">
+        <button class="btn" id="dialogCancelBtn" onclick="closeCustomDialog()">취소</button>
+        <button class="btn btn-primary" id="dialogOkBtn">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 관리자 비밀번호 변경 모달 ==================== -->
+  <div class="modal-backdrop" id="pwd-change-backdrop" onclick="if(event.target===this) closeChangePwdModal()">
+    <div class="modal sm-modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">관리자 비밀번호 변경</div>
+          <div class="modal-sub">변경된 비밀번호는 클라우드 DB에 저장되어 모든 기기에 동일하게 적용됩니다.</div>
+        </div>
+        <button class="p-icon-btn" onclick="closeChangePwdModal()" title="닫기">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+      <form id="changePwdForm">
+        <div class="modal-body" style="gap:12px;">
+          <div>
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#475569; margin-bottom:5px;">현재 비밀번호</label>
+            <input type="password" id="curPwdInput" class="dialog-input" placeholder="현재 비밀번호 입력" autocomplete="off" required />
+          </div>
+          <div>
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#475569; margin-bottom:5px;">새 비밀번호</label>
+            <input type="password" id="newPwdInput" class="dialog-input" placeholder="새 비밀번호 입력 (4자 이상)" autocomplete="off" required />
+          </div>
+          <div>
+            <label style="display:block; font-size:12.5px; font-weight:700; color:#475569; margin-bottom:5px;">새 비밀번호 확인</label>
+            <input type="password" id="confirmPwdInput" class="dialog-input" placeholder="새 비밀번호 다시 입력" autocomplete="off" required />
+          </div>
+          <div id="changePwdError" style="min-height:18px; font-size:12.5px; font-weight:700; color:#dc2626;"></div>
+        </div>
+        <div class="modal-footer" style="justify-content:flex-end;">
+          <button type="button" class="btn" onclick="closeChangePwdModal()">취소</button>
+          <button type="submit" class="btn btn-primary">비밀번호 변경 저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== 토스트 알림 ==================== -->
+  <div class="toast" id="toast">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 6 9 17l-5-5"/>
+    </svg>
+    <span id="toast-msg">저장되었습니다</span>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+  /* =========================================================================
+     Netlify 자동 삽입 위젯(Powered by Netlify / Build your own site) 강제 제거
+     ========================================================================= */
+  (function stripNetlifyBadge() {
+    const removeWidgets = () => {
+      document.querySelectorAll('iframe, div, aside, a, section').forEach((el) => {
+        if (el.id === 'lockScreen' || el.closest('#lockScreen') || el.closest('.global-header') || el.closest('.tab-panel') || el.closest('.modal-backdrop')) return;
+        const src = (el.getAttribute('src') || '').toLowerCase();
+        const id = (el.id || '').toLowerCase();
+        const cls = (typeof el.className === 'string' ? el.className : '').toLowerCase();
+        const txt = (el.textContent || '').trim();
+        if (
+          src.includes('netlify') ||
+          id.includes('netlify') ||
+          cls.includes('netlify') ||
+          txt.includes('Powered by Netlify') ||
+          txt.includes('Build your own site with Netlify')
+        ) {
+          el.remove();
+        }
+      });
+    };
+    removeWidgets();
+    const obs = new MutationObserver(() => removeWidgets());
+    obs.observe(document.documentElement, { childList: true, subtree: true });
+    setInterval(removeWidgets, 800);
+  })();
+
+  /* =========================================================================
+     아이폰 홈 화면 바로가기 & 파비콘용 심플 크랩 PNG 아이콘 자동 생성
+     ========================================================================= */
+  (function generateCuteCrabAppIcon() {
+    try {
+      const size = 512;
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+
+      const bgGrad = ctx.createLinearGradient(0, 0, size, size);
+      bgGrad.addColorStop(0, "#fb7185");
+      bgGrad.addColorStop(0.5, "#f43f5e");
+      bgGrad.addColorStop(1, "#ea580c");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, size, size);
+
+      const glow = ctx.createRadialGradient(180, 130, 20, 220, 180, 320);
+      glow.addColorStop(0, "rgba(255, 255, 255, 0.25)");
+      glow.addColorStop(1, "rgba(255, 255, 255, 0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, size, size);
+
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#ffffff";
+      ctx.fillStyle = "#ffffff";
+
+      ctx.lineWidth = 24;
+      ctx.beginPath();
+      ctx.moveTo(175, 255);
+      ctx.quadraticCurveTo(125, 225, 132, 180);
+      ctx.moveTo(337, 255);
+      ctx.quadraticCurveTo(387, 225, 380, 180);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(132, 185);
+      ctx.quadraticCurveTo(82, 155, 108, 108);
+      ctx.quadraticCurveTo(134, 132, 134, 154);
+      ctx.quadraticCurveTo(154, 130, 174, 114);
+      ctx.quadraticCurveTo(188, 162, 132, 185);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(380, 185);
+      ctx.quadraticCurveTo(430, 155, 404, 108);
+      ctx.quadraticCurveTo(378, 132, 378, 154);
+      ctx.quadraticCurveTo(358, 130, 338, 114);
+      ctx.quadraticCurveTo(324, 162, 380, 185);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.lineWidth = 22;
+      const legCoords = [
+        [140, 290, 95, 282, 68, 305],
+        [138, 332, 92, 338, 66, 368],
+        [156, 370, 118, 388, 98, 422],
+        [372, 290, 417, 282, 444, 305],
+        [374, 332, 420, 338, 446, 368],
+        [356, 370, 394, 388, 414, 422]
+      ];
+      legCoords.forEach(([x1, y1, cx, cy, x2, y2]) => {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.quadraticCurveTo(cx, cy, x2, y2);
+        ctx.stroke();
+      });
+
+      ctx.save();
+      ctx.shadowColor = "rgba(15, 23, 42, 0.16)";
+      ctx.shadowBlur = 18;
+      ctx.shadowOffsetY = 8;
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.ellipse(256, 322, 136, 92, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      const pngUrl = canvas.toDataURL("image/png");
+      const appleLink = document.getElementById("appleTouchIcon");
+      const favLink = document.getElementById("faviconIcon");
+      if (appleLink) appleLink.href = pngUrl;
+      if (favLink) favLink.href = pngUrl;
+    } catch (e) {}
+  })();
+
+  /* =========================================================================
+     0. 보안 잠금 화면 (초기 관리자 비밀번호: 2344 / 영구 로그인 유지 & 클라우드 동기화)
+     ========================================================================= */
+  const DEFAULT_ADMIN_PASSWORD = "2344";
+  let currentAdminPassword = DEFAULT_ADMIN_PASSWORD;
+  const PERSISTENT_AUTH_KEY = "crab_store_unlocked_persist_v1";
+
+  const lockScreen = document.getElementById("lockScreen");
+  const lockCard = document.getElementById("lockCard");
+  const lockForm = document.getElementById("lockForm");
+  const lockPwdInput = document.getElementById("lockPwdInput");
+  const lockError = document.getElementById("lockError");
+  const togglePwdVis = document.getElementById("togglePwdVis");
+
+  function checkInitialLock() {
+    try {
+      if (localStorage.getItem(PERSISTENT_AUTH_KEY) === "true") {
+        lockScreen.classList.add("hidden");
+      } else {
+        lockScreen.classList.remove("hidden");
+        setTimeout(() => lockPwdInput.focus(), 50);
+      }
+    } catch (e) {
+      lockScreen.classList.remove("hidden");
+    }
+  }
+
+  lockForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const entered = (lockPwdInput.value || "").trim();
+    if (entered === currentAdminPassword || entered === DEFAULT_ADMIN_PASSWORD) {
+      if (entered === DEFAULT_ADMIN_PASSWORD && currentAdminPassword !== DEFAULT_ADMIN_PASSWORD) {
+        currentAdminPassword = DEFAULT_ADMIN_PASSWORD;
+        scheduleCloudSave("auth", { password: currentAdminPassword });
+      }
+      lockError.textContent = "";
+      lockPwdInput.value = "";
+      try { localStorage.setItem(PERSISTENT_AUTH_KEY, "true"); } catch (err) {}
+      lockScreen.classList.add("hidden");
+      showToast("관리자 인증 완료 · 자동 로그인 유지됨");
+    } else {
+      lockError.textContent = "비밀번호가 올바르지 않습니다. 다시 확인해 주세요.";
+      lockCard.classList.remove("shake");
+      void lockCard.offsetWidth;
+      lockCard.classList.add("shake");
+      lockPwdInput.select();
+    }
+  });
+
+  togglePwdVis.addEventListener("click", () => {
+    lockPwdInput.type = lockPwdInput.type === "password" ? "text" : "password";
+    lockPwdInput.focus();
+  });
+
+  window.lockApp = () => {
+    try { localStorage.removeItem(PERSISTENT_AUTH_KEY); } catch (e) {}
+    lockPwdInput.value = "";
+    lockError.textContent = "";
+    lockScreen.classList.remove("hidden");
+    setTimeout(() => lockPwdInput.focus(), 50);
+  };
+
+  /* ==================== 비밀번호 변경 모달 제어 ==================== */
+  window.openChangePwdModal = () => {
+    document.getElementById("curPwdInput").value = "";
+    document.getElementById("newPwdInput").value = "";
+    document.getElementById("confirmPwdInput").value = "";
+    document.getElementById("changePwdError").textContent = "";
+    document.getElementById("pwd-change-backdrop").classList.add("open");
+    setTimeout(() => document.getElementById("curPwdInput").focus(), 40);
+  };
+
+  window.closeChangePwdModal = () => {
+    document.getElementById("pwd-change-backdrop").classList.remove("open");
+  };
+
+  document.getElementById("changePwdForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const curVal = document.getElementById("curPwdInput").value;
+    const newVal = document.getElementById("newPwdInput").value.trim();
+    const confirmVal = document.getElementById("confirmPwdInput").value.trim();
+    const errEl = document.getElementById("changePwdError");
+
+    if (curVal !== currentAdminPassword) {
+      errEl.textContent = "현재 비밀번호가 일치하지 않습니다.";
+      document.getElementById("curPwdInput").focus();
+      return;
+    }
+    if (newVal.length < 4) {
+      errEl.textContent = "새 비밀번호는 최소 4자 이상 입력해 주세요.";
+      document.getElementById("newPwdInput").focus();
+      return;
+    }
+    if (newVal !== confirmVal) {
+      errEl.textContent = "새 비밀번호와 확인 입력값이 일치하지 않습니다.";
+      document.getElementById("confirmPwdInput").focus();
+      return;
+    }
+
+    currentAdminPassword = newVal;
+    scheduleCloudSave("auth", { password: currentAdminPassword });
+    closeChangePwdModal();
+    showToast("비밀번호가 변경되었습니다");
+  });
+
+  checkInitialLock();
+
+  /* =========================================================================
+     상단 통합 탭 전환
+     ========================================================================= */
+  window.switchMainTab = (tabName) => {
+    document.querySelectorAll(".nav-tab").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.tab === tabName);
+    });
+    document.querySelectorAll(".tab-panel").forEach(panel => {
+      panel.classList.toggle("active", panel.id === `panel-${tabName}`);
+    });
+  };
+
+  /* =========================================================================
+     공통 유틸 (토스트, 커스텀 모달, 클립보드, 스크롤 고정)
+     ========================================================================= */
+  let savedScrollY = 0;
+
+  function preserveScrollRender(renderFn) {
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    renderFn();
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: y, behavior: "instant" });
+    });
+  }
+
+  let toastTimer = null;
+  window.showToast = (msg) => {
+    const toast = document.getElementById("toast");
+    document.getElementById("toast-msg").textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+  };
+
+  let dialogCallback = null;
+  window.confirmAction = (title, desc, onConfirm, isDanger = true) => {
+    savedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.getElementById("dialogTitle").textContent = title;
+    document.getElementById("dialogDesc").textContent = desc;
+    document.getElementById("dialogInputWrap").style.display = "none";
+    const okBtn = document.getElementById("dialogOkBtn");
+    okBtn.className = isDanger ? "btn btn-danger-ghost" : "btn btn-primary";
+    okBtn.textContent = "확인";
+    dialogCallback = () => onConfirm();
+    document.getElementById("custom-dialog-backdrop").classList.add("open");
+  };
+
+  window.promptAction = (title, desc, defaultVal, onSubmit) => {
+    savedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.getElementById("dialogTitle").textContent = title;
+    document.getElementById("dialogDesc").textContent = desc;
+    const wrap = document.getElementById("dialogInputWrap");
+    const inp = document.getElementById("dialogInput");
+    wrap.style.display = "block";
+    inp.value = defaultVal ?? "";
+    const okBtn = document.getElementById("dialogOkBtn");
+    okBtn.className = "btn btn-primary";
+    okBtn.textContent = "저장";
+    dialogCallback = () => onSubmit(inp.value);
+    document.getElementById("custom-dialog-backdrop").classList.add("open");
+    setTimeout(() => { inp.focus({ preventScroll: true }); inp.select(); }, 30);
+  };
+
+  window.closeCustomDialog = () => {
+    document.getElementById("custom-dialog-backdrop").classList.remove("open");
+    dialogCallback = null;
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: savedScrollY, behavior: "instant" });
+    });
+  };
+
+  document.getElementById("dialogOkBtn").addEventListener("click", () => {
+    const cb = dialogCallback;
+    const y = savedScrollY;
+    document.getElementById("custom-dialog-backdrop").classList.remove("open");
+    dialogCallback = null;
+    if (cb) cb();
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: y, behavior: "instant" });
+    });
+  });
+
+  document.getElementById("dialogInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const cb = dialogCallback;
+      const y = savedScrollY;
+      document.getElementById("custom-dialog-backdrop").classList.remove("open");
+      dialogCallback = null;
+      if (cb) cb();
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: y, behavior: "instant" });
+      });
+    }
+  });
+
+  function copyToClipboard(text, label, el) {
+    const str = String(text);
+    const done = () => {
+      if (el) {
+        el.classList.remove("copied-flash");
+        void el.offsetWidth;
+        el.classList.add("copied-flash");
+      }
+      showToast(label ? `${label} 복사됨` : "복사되었습니다");
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(str).then(done).catch(() => {
+        const ta = document.createElement("textarea");
+        ta.value = str;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (e) {}
+        document.body.removeChild(ta);
+        done();
+      });
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = str;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+      done();
+    }
+  }
+
+  /* =========================================================================
+     클라우드 DB (Firebase Firestore) 실시간 연동 모듈 (POS · PC · 모바일 공용)
+     ========================================================================= */
+  const clone = (obj) => JSON.parse(JSON.stringify(obj));
+
+  const DEFAULT_PRICE_STATE = {
+    snowPrice: 105000,
+    kingPrice: 115000,
+    snowRows: [
+      { id: "s1", weight: 1.0, count: "1", customLabel: "" },
+      { id: "s2", weight: 1.2, count: "1", customLabel: "" },
+      { id: "s3", weight: 1.5, count: "1", customLabel: "" },
+      { id: "s4", weight: 2.0, count: "2", customLabel: "" },
+      { id: "s5", weight: 2.4, count: "2", customLabel: "" },
+      { id: "s6", weight: 3.0, count: "3", customLabel: "" },
+      { id: "s7", weight: 3.5, count: "3", customLabel: "" },
+      { id: "s8", weight: 4.0, count: "4", customLabel: "" }
+    ],
+    kingRows: [
+      { id: "k1", weight: 2.8, count: "1", customLabel: "" },
+      { id: "k2", weight: 3.0, count: "1", customLabel: "" },
+      { id: "k3", weight: 3.5, count: "1", customLabel: "" },
+      { id: "k4", weight: 3.5, count: "1", customLabel: "" },
+      { id: "k5", weight: 3.6, count: "1", customLabel: "" },
+      { id: "k6", weight: 3.8, count: "1", customLabel: "" },
+      { id: "k7", weight: 3.6, count: "1", customLabel: "" },
+      { id: "k8", weight: 4.0, count: "1", customLabel: "" }
+    ]
+  };
+
+  const DEFAULT_MARGIN_STATE = {
+    sales: 105000,
+    cost: 50000,
+    packaging: 2000,
+    cpCoupon: 0,
+    bmCoupon: 0,
+    cpBrokerage: 7.8,
+    cpPg: 3.0,
+    cpDelivery: 3400,
+    bmBrokerage: 6.8,
+    bmPg: 1.55,
+    bmDelivery: 2900
+  };
+
+  function makeEmptyLedgerYear() {
+    const obj = {};
+    for (let m = 1; m <= 12; m++) obj[m] = { buys: [], pays: [] };
+    return obj;
+  }
+
+  const INITIAL_LEDGER_DATA = {
+    "2025": {
+      1: { buys: [{d:"전년",a:167611000},{d:"13",a:8175000}], pays: [{d:"전년",a:94000000},{d:"13",a:10000000}] },
+      2: { buys: [{d:"5",a:2750000},{d:"13",a:2310000},{d:"21",a:2929000},{d:"28",a:4408000}], pays: [{d:"5",a:20000000},{d:"28",a:7000000}] },
+      3: { buys: [{d:"8",a:6608000},{d:"22",a:2670000}], pays: [{d:"8",a:7000000},{d:"22",a:5000000}] },
+      4: { buys: [{d:"3",a:3978000},{d:"14",a:4182000},{d:"26",a:2982000}], pays: [{d:"3",a:5000000}] },
+      5: { buys: [{d:"2",a:4596000},{d:"10",a:2168000},{d:"16",a:1761000},{d:"29",a:2250000}], pays: [{d:"2",a:5000000},{d:"16",a:7000000},{d:"29",a:5000000}] },
+      6: { buys: [{d:"2",a:2240000},{d:"10",a:4436000},{d:"25",a:2513000}], pays: [{d:"10",a:5000000},{d:"25",a:5000000}] },
+      7: { buys: [{d:"3",a:1930000},{d:"10",a:1506000},{d:"11",a:2093000},{d:"24",a:5798000},{d:"31",a:4095000}], pays: [{d:"20",a:6000000},{d:"31",a:5000000}] },
+      8: { buys: [{d:"7",a:2612000},{d:"15",a:2686000},{d:"23",a:4309000},{d:"29",a:2641000}], pays: [{d:"7",a:5000000},{d:"23",a:7000000}] },
+      9: { buys: [{d:"9",a:2855000},{d:"18",a:7793000},{d:"25",a:6825000}], pays: [{d:"9",a:5000000},{d:"18",a:5000000},{d:"25",a:5000000}] },
+      10: { buys: [{d:"2",a:4317000},{d:"24",a:3588000},{d:"30",a:1793000}], pays: [{d:"17",a:7000000},{d:"24",a:5000000}] },
+      11: { buys: [{d:"6",a:3575000},{d:"12",a:3464000},{d:"22",a:498000},{d:"27",a:6800000}], pays: [{d:"16",a:5000000},{d:"19",a:5000000}] },
+      12: { buys: [{d:"5",a:6952000},{d:"13",a:4263000},{d:"20",a:7288000},{d:"25",a:5258000},{d:"31",a:15221000}], pays: [{d:"3",a:5000000},{d:"13",a:7000000},{d:"18",a:7000000},{d:"24",a:8000000},{d:"31",a:10000000}] }
+    },
+    "2026": {
+      1: { buys: [{d:"10",a:450000},{d:"22",a:4830000},{d:"23",a:4270000},{d:"28",a:2340600}], pays: [{d:"22",a:15000000}] },
+      2: { buys: [{d:"7",a:6172000},{d:"12",a:6297000},{d:"14",a:3747000},{d:"27",a:355000}], pays: [{d:"10",a:10000000},{d:"20",a:10000000}] },
+      3: { buys: [{d:"6",a:4610000},{d:"13",a:2619000},{d:"21",a:4978000},{d:"27",a:2898000}], pays: [{d:"6",a:5000000},{d:"21",a:9000000}] },
+      4: { buys: [{d:"1",a:4757000},{d:"18",a:3519000},{d:"23",a:1754000},{d:"30",a:5859000}], pays: [{d:"14",a:8000000},{d:"30",a:7000000}] },
+      5: { buys: [{d:"8",a:2637000},{d:"16",a:2976000},{d:"23",a:2472000}], pays: [] },
+      6: { buys: [{d:"3",a:4843000},{d:"12",a:4488000},{d:"19",a:3131000},{d:"26",a:3108000}], pays: [{d:"1",a:10000000},{d:"18",a:10000000}] },
+      7: { buys: [{d:"10",a:2630000},{d:"17",a:2027000},{d:"23",a:2798000},{d:"25",a:1771000}], pays: [{d:"10",a:5000000},{d:"25",a:5000000}] },
+      8: { buys: [{d:"6",a:5536000},{d:"19",a:4080000},{d:"28",a:2194000}], pays: [{d:"6",a:4000000},{d:"19",a:5000000}] },
+      9: { buys: [{d:"1",a:5130000},{d:"18",a:9222000},{d:"18",a:470000},{d:"24",a:3379000}], pays: [{d:"15",a:7000000},{d:"30",a:10000000}] },
+      10: { buys: [{d:"1",a:1723000},{d:"16",a:3310000},{d:"23",a:3971000},{d:"29",a:1747000}], pays: [{d:"21",a:9000000}] },
+      11: { buys: [{d:"6",a:4514000},{d:"9",a:1892000},{d:"14",a:3628000}], pays: [{d:"14",a:10000000}] },
+      12: { buys: [], pays: [] }
+    }
+  };
+
+  function makeEmptySalesYear() {
+    const obj = {};
+    for (let m = 1; m <= 12; m++) obj[m] = { days: {}, fallback: null };
+    return obj;
+  }
+
+  function buildInitialSalesData() {
+    const data = { "2025": makeEmptySalesYear(), "2026": makeEmptySalesYear() };
+    const m2025 = {
+      1:[187.77,51.54], 2:[187.93,23.40], 3:[195.90,36.64], 4:[176.40,13.40],
+      5:[234.91,61.58], 6:[238.82,20.00], 7:[226.28,47.70], 8:[265.30,27.40],
+      9:[233.56,50.98], 10:[179.00,74.35], 11:[231.48,48.64], 12:[356.72,78.81]
+    };
+    for (let m = 1; m <= 12; m++) data["2025"][m].fallback = { s: m2025[m][0], k: m2025[m][1] };
+
+    const d2026 = {
+      1: {
+        s: [7.2,6.3,11.3,5.5,1.0,1.2,5.0,7.7,7.6,17.1, 2.0,7.8,1.6,2.9,3.0,7.5,11.9,11.6,3.2,9.2, 2.0,16.0,25.8,4.0,3.0,0,4.2,4.1,12.0,10.5,20.7],
+        k: [2.3,2.3,0,0,0,0,0,0,0,3.6, 8.8,3.0,3.1,3.2,0,10.9,3.0,0,0,0, 0,0,0,0,2.8,0,3.8,0,0,0,4.8]
+      },
+      2: {
+        s: [13.6,1.3,4.1,4.0,3.2,4.6,17.2,15.8,5.2,0, 4.6,7.6,14.7,11.0,10.6,1.4,11.5,8.8,1.0,6.3, 3.0,5.0,2.6,4.7,1.5,1.0,12.7,15.0],
+        k: [0,4.2,5.2,0,0,0,14.5,6.6,2.8,0, 7.2,0,3.4,2.4,0,0,0,2.3,1.2,1.2, 4.5,3.6,0,2.3,0,2.2,0,7.6]
+      },
+      3: {
+        s: [7.1,3.8,0,2.2,8.8,10.4,13.8,0,7.2,11.6, 0,4.4,4.3,14.5,1.4,0,2.1,6.4,4.0,10.8, 10.4,17.3,2.2,2.7,4.2,18.3,7.7,25.3,12.8,0,4.0],
+        k: [3.8,0,2.3,2.3,5.1,0,13.2,2.6,0,1.3, 0,1.3,0,1.0,0,0,0,0,0,1.3, 3.0,4.0,0,0,0,0,0,5.6,4.4,2.0,2.6]
+      },
+      4: {
+        s: [11.2,2.0,3.8,5.9,4.9,1.2,0,4.6,8.3,4.2, 0,0,1.0,3.9,4.2,2.0,2.0,15.0,9.1,2.0, 5.8,0,8.4,8.1,13.1,1.3,7.4,10.3,2.5,2.2],
+        k: [2.2,0,0,5.4,2.5,0,0,0,2.7,2.1, 4.4,0,0,2.2,2.5,0,0,4.2,4.5,0, 0,0,0,2.0,2.0,2.0,0,0,0,2.0]
+      },
+      5: {
+        s: [1.4,2.4,0,5.0,8.9,0,0,25.3,18.3,7.0, 3.1,3.1,3.0,4.6,11.1,15.0,0,6.0,0,13.0, 9.8,4.8,3.5,15.6,14.9,5.1,4.4,7.1,5.9,18.3,3.5],
+        k: [0,2.0,6.8,0,2.3,0,2.5,2.3,12.2,0, 0,0,2.1,0,0,6.8,0,0,0,0, 0,4.8,4.0,1.9,0,0,0,0,0,6.5,0]
+      },
+      6: {
+        s: [6.6,5.2,7.54,10.8,1.0,9.24,7.3,2.2,0,14.7, 21.2,5.0,14.5,8.0,3.6,8.4,12.0,3.9,4.5,30.1, 1.6,0,4.8,8.4,15.2,8.0,20.0,10.5,1.2,4.2],
+        k: [0,0,0,2.1,2.6,2.1,0,0,0,2.5, 8.3,2.5,6.0,3.1,0,0,0,0,2.3,0, 0,0,2.1,0,3.1,4.8,0,2.1,2.2,2.2]
+      },
+      7: {
+        s: [9.2,0,11.5,3.4,2.0,2.4,4.7,0,7.6,5.7, 10.8,9.6,0,0,0,6.3,12.8,1.4,19.0,0, 3.0,13.0,27.2,1.2,16.0,6.7,5.2,5.0,5.0,10.5,3.2],
+        k: [0,0,0,2.2,2.5,2.7,0,0,0,4.7, 0,0,0,0,0,0,4.5,7.5,2.3,0, 0,2.4,2.2,0,0,2.2,0,0,0,0,0]
+      },
+      8: {
+        s: [24.7,8.5,0,0,0,0,3.5,3.2,5.3,0, 4.0,6.9,8.2,4.9,18.1,7.3,10.8,13.9,1.2,5.2, 9.4,9.5,8.0,1.5,8.7,1.3,6.5,11.4,15.9,0,9.0],
+        k: [4.4,0,0,0,0,0,0,0,2.1,0, 2.3,0,0,0,2.2,0,9.3,0,0,0, 0,6.7,6.3,0,0,0,2.4,0,0,0,0]
+      },
+      9: {
+        s: [7.2,0,4.3,6.0,6.9,7.9,0,0,2.3,12.38, 12.0,7.0,7.0,4.4,1.0,21.6,15.5,4.2,15.3,10.2, 28.2,8.3,5.4,6.4,8.4,10.0,24.4,3.5,0,12.3],
+        k: [0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,3.2,2.8,0, 2.8,0,2.8,2.2,3.2,0,0,0,0,0]
+      },
+      10: {
+        s: [5.75,7.4,2.0,8.95,0,3.0,1.4,5.5,10.4,7.3, 9.2,1.0,0,5.3,7.1,13.8,6.0,7.0,2.0,0, 19.1,7.5,15.8,11.9,3.0,2.4,0,2.0,0,8.8,10.7],
+        k: [0,6.0,0,0,0,0,0,0,2.5,2.9, 0,4.2,0,2.2,8.4,3.5,0,0,0,0, 3.2,0,2.7,2.9,0,0,0,0,0,3.0,9.4]
+      },
+      11: {
+        s: [6.5,19.72,5.2,3.5,6.3,7.4,22.5,13.0,0,7.9, 5.3,5.2,3.3,9.3,7.1,2.6,11.1,11.3,5.4,2.0, 20.6,13.0,0,0,0,0,0,0,0,0],
+        k: [0,0,0,0,0,3.2,2.4,2.6,2.4,0, 5.3,0,3.1,8.7,0,0,0,6.0,12.9,0, 3.3,0,0,0,0,0,0,0,0,0]
+      }
+    };
+    for (let m = 1; m <= 11; m++) {
+      d2026[m].s.forEach((sv, idx) => {
+        const kv = d2026[m].k[idx] || 0;
+        if (sv > 0 || kv > 0) data["2026"][m].days[idx + 1] = { s: sv, k: kv };
+      });
+    }
+    return data;
+  }
+
+  let modalCategory = "snow";
+  let modalHighlightId = null;
+
+  function toTenths(weight) {
+    const num = parseFloat(weight);
+    if (isNaN(num) || num < 0) return 0;
+    return Math.round(num * 10);
+  }
+
+  const LOCAL_BACKUP_PREFIX = "crab_store_backup_v2_";
+  function readLocalBackup(key, fallback) {
+    try {
+      const raw = localStorage.getItem(LOCAL_BACKUP_PREFIX + key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+  function writeLocalBackup(key, data) {
+    try { localStorage.setItem(LOCAL_BACKUP_PREFIX + key, JSON.stringify(data)); } catch (e) {}
+  }
+
+  let priceState = readLocalBackup("prices", clone(DEFAULT_PRICE_STATE));
+  let marginState = readLocalBackup("margin", clone(DEFAULT_MARGIN_STATE));
+  let ledgerDB = readLocalBackup("ledger", clone(INITIAL_LEDGER_DATA));
+  let salesDB = readLocalBackup("sales", buildInitialSalesData());
+  const savedAuth = readLocalBackup("auth", { password: DEFAULT_ADMIN_PASSWORD });
+  currentAdminPassword = (savedAuth.password && savedAuth.password !== "2344@#") ? savedAuth.password : DEFAULT_ADMIN_PASSWORD;
+  if (savedAuth.password === "2344@#") {
+    writeLocalBackup("auth", { password: DEFAULT_ADMIN_PASSWORD });
+  }
+
+  function ensure2026AugToNovDaily(targetSalesDB) {
+    if (!targetSalesDB) return false;
+    const fresh = buildInitialSalesData();
+    if (!targetSalesDB["2026"]) targetSalesDB["2026"] = fresh["2026"];
+    let updated = false;
+    for (let m = 8; m <= 11; m++) {
+      if (!targetSalesDB["2026"][m]) {
+        targetSalesDB["2026"][m] = clone(fresh["2026"][m]);
+        updated = true;
+        continue;
+      }
+      if (!targetSalesDB["2026"][m].days) targetSalesDB["2026"][m].days = {};
+      if (targetSalesDB["2026"][m].fallback) {
+        targetSalesDB["2026"][m].fallback = null;
+        updated = true;
+      }
+      const freshDays = fresh["2026"][m].days;
+      Object.keys(freshDays).forEach((dayKey) => {
+        const curDay = targetSalesDB["2026"][m].days[dayKey];
+        if (!curDay || ((curDay.s || 0) === 0 && (curDay.k || 0) === 0)) {
+          targetSalesDB["2026"][m].days[dayKey] = clone(freshDays[dayKey]);
+          updated = true;
+        }
+      });
+    }
+    return updated;
+  }
+
+  if (ensure2026AugToNovDaily(salesDB)) {
+    writeLocalBackup("sales", salesDB);
+  }
+
+  let dbInstance = null;
+  let currentUser = null;
+  const appId = typeof __app_id !== "undefined" ? __app_id : "crabgoodday";
+  const saveTimers = {};
+  const lastLocalWriteAt = {};
+
+  function setSyncStatus(mode, text) {
+    const badge = document.getElementById("syncBadge");
+    const label = document.getElementById("syncText");
+    if (!badge || !label) return;
+    badge.className = "sync-badge" + (mode === "saving" ? " saving" : mode === "offline" ? " offline" : "");
+    label.textContent = text;
+  }
+
+  function scheduleCloudSave(docKey, dataObj) {
+    writeLocalBackup(docKey, dataObj);
+    lastLocalWriteAt[docKey] = Date.now();
+    if (!dbInstance || !currentUser) return;
+
+    setSyncStatus("saving", "동기화 저장 중...");
+    clearTimeout(saveTimers[docKey]);
+    saveTimers[docKey] = setTimeout(async () => {
+      try {
+        const ref = doc(dbInstance, "artifacts", appId, "public", "data", "crab_store_data", docKey);
+        await setDoc(ref, { payload: JSON.stringify(dataObj), updatedAt: Date.now() });
+        setSyncStatus("online", "클라우드 실시간 동기화됨");
+      } catch (err) {
+        console.error("Cloud save failed:", err);
+        setSyncStatus("offline", "로컬 백업 저장됨");
+      }
+    }, 350);
+  }
+
+  function isUserTypingInside(containerId) {
+    const active = document.activeElement;
+    const container = document.getElementById(containerId);
+    if (!active || !container) return false;
+    return container.contains(active) && (active.tagName === "INPUT" || active.tagName === "SELECT");
+  }
+
+  function attachRealtimeListeners() {
+    if (!dbInstance || !currentUser) return;
+    const keys = ["auth", "prices", "margin", "ledger", "sales"];
+
+    keys.forEach((key) => {
+      const ref = doc(dbInstance, "artifacts", appId, "public", "data", "crab_store_data", key);
+      onSnapshot(ref, (snap) => {
+        if (!snap.exists()) {
+          const initialMap = {
+            auth: { password: currentAdminPassword },
+            prices: priceState,
+            margin: marginState,
+            ledger: ledgerDB,
+            sales: salesDB
+          };
+          scheduleCloudSave(key, initialMap[key]);
+          return;
+        }
+
+        if (Date.now() - (lastLocalWriteAt[key] || 0) < 1200) return;
+
+        try {
+          const raw = snap.data().payload;
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          writeLocalBackup(key, parsed);
+
+          if (key === "auth" && parsed.password) {
+            if (parsed.password === "2344@#") {
+              currentAdminPassword = DEFAULT_ADMIN_PASSWORD;
+              scheduleCloudSave("auth", { password: DEFAULT_ADMIN_PASSWORD });
+            } else {
+              currentAdminPassword = parsed.password;
+            }
+          } else if (key === "prices") {
+            priceState = parsed;
+            if (!isUserTypingInside("panel-price")) preserveScrollRender(renderAllPrices);
+          } else if (key === "margin") {
+            marginState = parsed;
+            if (!isUserTypingInside("panel-margin")) preserveScrollRender(applyMarginStateToInputs);
+          } else if (key === "ledger") {
+            ledgerDB = parsed;
+            if (!isUserTypingInside("panel-ledger")) preserveScrollRender(renderLedger);
+          } else if (key === "sales") {
+            salesDB = parsed;
+            if (ensure2026AugToNovDaily(salesDB)) {
+              scheduleCloudSave("sales", salesDB);
+            }
+            if (!isUserTypingInside("panel-sales")) preserveScrollRender(renderSales);
+          }
+          setSyncStatus("online", "클라우드 실시간 동기화됨");
+        } catch (e) {
+          console.error("Snapshot parse error:", e);
+        }
+      }, (err) => {
+        console.error("Snapshot listener error:", err);
+        setSyncStatus("offline", "오프라인(로컬 백업)");
+      });
+    });
+  }
+
+  async function initCloudSync() {
+    try {
+      const firebaseConfig = typeof __firebase_config !== "undefined"
+        ? JSON.parse(__firebase_config)
+        : {
+            apiKey: "AIzaSyAGL0zUv3dhNKA-cJKkrRo-jrpnL9d6yOY",
+            authDomain: "crabgoodday.firebaseapp.com",
+            projectId: "crabgoodday",
+            storageBucket: "crabgoodday.firebasestorage.app",
+            messagingSenderId: "1057491017803",
+            appId: "1:1057491017803:web:a7b64a4c263d9cfc926dce",
+            measurementId: "G-9JWS5J8E6H"
+          };
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      dbInstance = getFirestore(app);
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          currentUser = user;
+          setSyncStatus("online", "클라우드 실시간 동기화됨");
+          attachRealtimeListeners();
+        }
+      });
+
+      if (typeof __initial_auth_token !== "undefined" && __initial_auth_token) {
+        await signInWithCustomToken(auth, __initial_auth_token);
+      } else {
+        await signInAnonymously(auth);
+      }
+    } catch (e) {
+      console.error("Firebase init failed:", e);
+      setSyncStatus("offline", "오프라인(로컬 백업)");
+    }
+  }
+
+  /* =========================================================================
+     TAB 1: 배달가격수정 로직
+     ========================================================================= */
+  function formatWeight(tenths) { return (tenths / 10).toFixed(1); }
+  function formatNumber(n) { return (Number(n) || 0).toLocaleString("ko-KR"); }
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function calcServings(tenths) {
+    if (tenths <= 0) return "0";
+    if (tenths <= 13) return "1";
+    const whole = Math.floor(tenths / 10);
+    const rem = tenths % 10;
+    let s;
+    if (rem <= 3) s = whole;
+    else if (rem <= 7) s = whole + 0.5;
+    else s = whole + 1;
+    return Number.isInteger(s) ? String(s) : s.toFixed(1);
+  }
+
+  function defaultCountFor(cat, tenths) {
+    if (cat === "king") return "1";
+    return String(Math.max(1, Math.floor(tenths / 10)));
+  }
+
+  function getAutoLabel(cat, row) {
+    const tenths = toTenths(row.weight);
+    const wStr = formatWeight(tenths);
+    const cnt = (row.count || "").trim() || defaultCountFor(cat, tenths);
+    const srv = calcServings(tenths);
+    return `${wStr}kg (${cnt}마리/${srv}인분)`;
+  }
+
+  function getDisplayLabel(cat, row) {
+    if (row.customLabel && row.customLabel.trim() !== "") return row.customLabel.trim();
+    return getAutoLabel(cat, row);
+  }
+
+  function calcRowPrices(unitPrice, rows) {
+    const price = Math.max(0, parseInt(unitPrice, 10) || 0);
+    const computed = rows.map((row) => {
+      const tenths = toTenths(row.weight);
+      const raw = Math.round((price * tenths) / 10);
+      const baemin = Math.floor(raw / 1000) * 1000;
+      return { raw, baemin };
+    });
+    const baseBaemin = computed.length > 0 ? computed[0].baemin : 0;
+    return computed.map((item) => ({
+      raw: item.raw,
+      baemin: item.baemin,
+      coupang: Math.max(0, item.baemin - baseBaemin)
+    }));
+  }
+
+  function renderPriceCard(cat) {
+    const isSnow = cat === "snow";
+    const title = isSnow ? "대게" : "킹크랩";
+    const priceKey = isSnow ? "snowPrice" : "kingPrice";
+    const rowsKey = isSnow ? "snowRows" : "kingRows";
+    const price = priceState[priceKey];
+    const rows = priceState[rowsKey];
+    const calc = calcRowPrices(price, rows);
+
+    const iconSvg = isSnow
+      ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18c4 0 7-2 7-4.8S16 8.5 12 8.5 5 10.5 5 13.2 8 18 12 18Z"/><path d="M7.5 9.5C5.8 7.8 5 6 5.8 4.8c.7-1.1 2.4-.7 3.2.8"/><path d="M16.5 9.5c1.7-1.7 2.5-3.5 1.7-4.7-.7-1.1-2.4-.7-3.2.8"/><path d="M5 13H2.5M19 13h2.5M5.8 16l-2 1.2M18.2 16l2 1.2"/></svg>`
+      : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 9 4 2 3-5 3 4 3-4 3 5 4-2-2 10H4L2 9Z"/></svg>`;
+
+    const rowsHtml = rows.map((row, idx) => {
+      const p = calc[idx];
+      const displayLabel = getDisplayLabel(cat, row);
+      const isCustom = !!(row.customLabel && row.customLabel.trim() !== "");
+
+      return `
+        <tr data-row-id="${row.id}">
+          <td style="width: 82px;">
+            <div class="p-weight-cell">
+              <input type="number" step="0.1" min="0.1" class="p-weight-input" value="${row.weight}" onchange="updatePriceWeight('${cat}', '${row.id}', this.value)" />
+              <span style="font-size:11px; font-weight:700; color:#94a3b8;">kg</span>
+            </div>
+          </td>
+          <td>
+            <div class="p-option-wrap">
+              <button class="p-option-copy-btn" onclick="copyPriceRowLabel('${cat}', '${row.id}', this)" title="클릭하여 옵션명 복사">
+                <span>${isCustom ? '<span class="custom-dot"></span>' : ''}${escapeHtml(displayLabel)}</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="opacity:0.45; flex-shrink:0;"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              </button>
+              <button class="p-icon-btn" onclick="openCountModal('${cat}', '${row.id}')" title="마릿수 / 옵션명 수정">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              </button>
+            </div>
+          </td>
+          <td style="width: 112px;">
+            <button class="p-price-copy-btn baemin" onclick="copyPriceRowVal('${cat}', '${row.id}', 'baemin', this)" title="클릭 시 숫자만 복사 (${p.baemin})">
+              <span class="p-price-main">${formatNumber(p.baemin)}</span>
+            </button>
+          </td>
+          <td style="width: 110px;">
+            <button class="p-price-copy-btn coupang" onclick="copyPriceRowVal('${cat}', '${row.id}', 'coupang', this)" title="클릭 시 숫자만 복사 (${p.coupang})">
+              <span class="p-price-main">${idx === 0 ? "0" : "+" + formatNumber(p.coupang)}</span>
+            </button>
+          </td>
+          <td style="width: 34px; text-align: center;">
+            <button class="p-icon-btn del" onclick="deletePriceRow('${cat}', '${row.id}')" title="행 삭제">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    document.getElementById(`card-${cat}`).innerHTML = `
+      <div class="p-card-header ${cat}">
+        <div class="p-card-title-row">
+          <div class="p-card-title-wrap">
+            <div class="p-cat-badge ${cat}">${iconSvg}</div>
+            <div>
+              <div style="font-size:17px; font-weight:800;">${title}</div>
+              <div style="font-size:12px; color:#64748b;">총 ${rows.length}개 옵션 · 천원 단위 자동 절삭</div>
+            </div>
+          </div>
+          <div class="p-bulk-group">
+            <button class="p-chip-btn" onclick="copyAllPrices('${cat}', 'label', this)">옵션명 전체</button>
+            <button class="p-chip-btn baemin" onclick="copyAllPrices('${cat}', 'baemin', this)">배민 전체</button>
+            <button class="p-chip-btn coupang" onclick="copyAllPrices('${cat}', 'coupang', this)">쿠팡 전체</button>
+          </div>
+        </div>
+        <div class="p-price-control">
+          <div class="p-price-input-box">
+            <span style="font-size:12.5px; font-weight:700; color:#475569;">1kg 싯가</span>
+            <div class="p-price-field-wrap">
+              <input type="text" inputmode="numeric" class="p-price-input" value="${formatNumber(price)}" onfocus="this.select()" oninput="handleUnitPriceInput('${cat}', this)" />
+              <span class="p-price-unit">원</span>
+            </div>
+          </div>
+          <div class="p-step-btns">
+            <button class="p-step-btn minus" onclick="stepUnitPrice('${cat}', -5000)">-5천</button>
+            <button class="p-step-btn minus" onclick="stepUnitPrice('${cat}', -1000)">-1천</button>
+            <button class="p-step-btn plus" onclick="stepUnitPrice('${cat}', 1000)">+1천</button>
+            <button class="p-step-btn plus" onclick="stepUnitPrice('${cat}', 5000)">+5천</button>
+          </div>
+        </div>
+      </div>
+      <div class="p-table-wrap">
+        <table class="p-table">
+          <thead>
+            <tr>
+              <th>중량</th>
+              <th>옵션명 (클릭 복사)</th>
+              <th class="num">배민 판매가</th>
+              <th class="num">쿠팡 추가금</th>
+              <th class="center"></th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+      <div class="p-card-footer">
+        <button class="p-add-row-btn" onclick="addPriceRow('${cat}')">+ ${title} 행 추가</button>
+      </div>
+    `;
+  }
+
+  function renderAllPrices() {
+    renderPriceCard("snow");
+    renderPriceCard("king");
+  }
+
+  window.handleUnitPriceInput = (cat, inputEl) => {
+    const rawDigits = inputEl.value.replace(/[^0-9]/g, "");
+    const num = parseInt(rawDigits, 10) || 0;
+    const priceKey = cat === "snow" ? "snowPrice" : "kingPrice";
+    priceState[priceKey] = num;
+    scheduleCloudSave("prices", priceState);
+
+    const cursorFromEnd = inputEl.value.length - inputEl.selectionStart;
+    const formatted = num > 0 ? formatNumber(num) : "";
+    inputEl.value = formatted;
+    const newPos = Math.max(0, formatted.length - cursorFromEnd);
+    try { inputEl.setSelectionRange(newPos, newPos); } catch (e) {}
+
+    const rowsKey = cat === "snow" ? "snowRows" : "kingRows";
+    const calc = calcRowPrices(num, priceState[rowsKey]);
+    const trs = document.querySelectorAll(`#card-${cat} tbody tr`);
+    trs.forEach((tr, idx) => {
+      const p = calc[idx];
+      if (!p) return;
+      const bBtn = tr.querySelector(".p-price-copy-btn.baemin");
+      const cBtn = tr.querySelector(".p-price-copy-btn.coupang");
+      if (bBtn) bBtn.innerHTML = `<span class="p-price-main">${formatNumber(p.baemin)}</span>`;
+      if (cBtn) cBtn.innerHTML = `<span class="p-price-main">${idx === 0 ? "0" : "+" + formatNumber(p.coupang)}</span>`;
+    });
+  };
+
+  window.stepUnitPrice = (cat, delta) => {
+    const priceKey = cat === "snow" ? "snowPrice" : "kingPrice";
+    priceState[priceKey] = Math.max(0, (parseInt(priceState[priceKey], 10) || 0) + delta);
+    scheduleCloudSave("prices", priceState);
+    preserveScrollRender(() => renderPriceCard(cat));
+  };
+
+  window.updatePriceWeight = (cat, id, val) => {
+    const rowsKey = cat === "snow" ? "snowRows" : "kingRows";
+    const row = priceState[rowsKey].find(r => r.id === id);
+    if (!row) return;
+    const num = parseFloat(val);
+    if (isNaN(num) || num <= 0) { preserveScrollRender(() => renderPriceCard(cat)); return; }
+    const oldTenths = toTenths(row.weight);
+    const newTenths = toTenths(num);
+    if (row.count === defaultCountFor(cat, oldTenths)) row.count = defaultCountFor(cat, newTenths);
+    row.weight = newTenths / 10;
+    scheduleCloudSave("prices", priceState);
+    preserveScrollRender(() => renderPriceCard(cat));
+  };
+
+  window.addPriceRow = (cat) => {
+    const rowsKey = cat === "snow" ? "snowRows" : "kingRows";
+    const rows = priceState[rowsKey];
+    const lastW = rows.length > 0 ? toTenths(rows[rows.length - 1].weight) : (cat === "snow" ? 10 : 28);
+    const nextT = lastW + 5;
+    rows.push({
+      id: cat[0] + Date.now() + Math.floor(Math.random() * 100),
+      weight: nextT / 10,
+      count: defaultCountFor(cat, nextT),
+      customLabel: ""
+    });
+    scheduleCloudSave("prices", priceState);
+    preserveScrollRender(() => renderPriceCard(cat));
+  };
+
+  window.deletePriceRow = (cat, id) => {
+    const rowsKey = cat === "snow" ? "snowRows" : "kingRows";
+    if (priceState[rowsKey].length <= 1) { showToast("최소 1개 행은 남아 있어야 합니다"); return; }
+    priceState[rowsKey] = priceState[rowsKey].filter(r => r.id !== id);
+    scheduleCloudSave("prices", priceState);
+    preserveScrollRender(() => renderPriceCard(cat));
+  };
+
+  window.copyPriceRowLabel = (cat, id, el) => {
+    const rowsKey = cat === "snow" ? "snowRows" : "kingRows";
+    const row = priceState[rowsKey].find(r => r.id === id);
+    if (row) copyToClipboard(getDisplayLabel(cat, row), "옵션명", el);
+  };
+
+  window.copyPriceRowVal = (cat, id, channel, el) => {
+    const priceKey = cat === "snow" ? "snowPrice" : "kingPrice";
+    const rowsKey = cat === "snow" ? "snowRows" : "kingRows";
+    const rows = priceState[rowsKey];
+    const idx = rows.findIndex(r => r.id === id);
+    if (idx < 0) return;
+    const calc = calcRowPrices(priceState[priceKey], rows)[idx];
+    if (channel === "baemin") copyToClipboard(String(calc.baemin), `배민 ${formatNumber(calc.baemin)}원`, el);
+    else copyToClipboard(String(calc.coupang), `쿠팡 ${formatNumber(calc.coupang)}원`, el);
+  };
+
+  window.copyAllPrices = (cat, type, el) => {
+    const priceKey = cat === "snow" ? "snowPrice" : "kingPrice";
+    const rowsKey = cat === "snow" ? "snowRows" : "kingRows";
+    const rows = priceState[rowsKey];
+    const calc = calcRowPrices(priceState[priceKey], rows);
+    const title = cat === "snow" ? "대게" : "킹크랩";
+    if (type === "label") copyToClipboard(rows.map(r => getDisplayLabel(cat, r)).join("\n"), `${title} 옵션명 전체`, el);
+    else if (type === "baemin") copyToClipboard(calc.map(c => String(c.baemin)).join("\n"), `${title} 배민 판매가 전체`, el);
+    else copyToClipboard(calc.map(c => String(c.coupang)).join("\n"), `${title} 쿠팡 추가금 전체`, el);
+  };
+
+  window.resetPriceState = () => {
+    priceState = clone(DEFAULT_PRICE_STATE);
+    scheduleCloudSave("prices", priceState);
+    renderAllPrices();
+    showToast("가격수정 설정이 기본값으로 초기화되었습니다");
+  };
+
+  /* 마릿수 · 옵션명 수정 모달 */
+  const PRESET_COUNTS = ["1", "1~2", "2", "2~3", "3", "3~4", "4"];
+
+  window.openCountModal = (cat, rowId) => {
+    modalCategory = cat || "snow";
+    modalHighlightId = rowId || null;
+    document.getElementById("count-modal-backdrop").classList.add("open");
+    renderCountModal();
+    setTimeout(() => {
+      if (modalHighlightId) {
+        const target = document.getElementById(`count-input-${modalHighlightId}`);
+        if (target) { target.focus(); target.select(); target.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      }
+    }, 30);
+  };
+
+  window.closeCountModal = () => {
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    document.getElementById("count-modal-backdrop").classList.remove("open");
+    modalHighlightId = null;
+    requestAnimationFrame(() => window.scrollTo({ top: y, behavior: "instant" }));
+  };
+
+  window.switchModalTab = (cat) => {
+    modalCategory = cat;
+    modalHighlightId = null;
+    renderCountModal();
+  };
+
+  function renderCountModal() {
+    document.getElementById("tab-snow").className = `tab-btn snow ${modalCategory === "snow" ? "active" : ""}`;
+    document.getElementById("tab-king").className = `tab-btn king ${modalCategory === "king" ? "active" : ""}`;
+    const rowsKey = modalCategory === "snow" ? "snowRows" : "kingRows";
+    const rows = priceState[rowsKey];
+
+    document.getElementById("count-modal-body").innerHTML = rows.map((row, idx) => {
+      const tenths = toTenths(row.weight);
+      const wStr = formatWeight(tenths);
+      const srv = calcServings(tenths);
+      const displayLabel = getDisplayLabel(modalCategory, row);
+      const isCustom = !!(row.customLabel && row.customLabel.trim() !== "");
+      const highlight = modalHighlightId === row.id ? "highlight" : "";
+
+      const chipsHtml = PRESET_COUNTS.map(preset => {
+        const active = !isCustom && row.count === preset ? "active" : "";
+        return `<button type="button" class="preset-chip ${active}" onclick="setRowCount('${modalCategory}', '${row.id}', '${preset}')">${preset}</button>`;
+      }).join("");
+
+      return `
+        <div class="edit-row-card ${highlight}" id="edit-card-${row.id}">
+          <div class="edit-row-top">
+            <span class="edit-weight-pill">${wStr}kg</span>
+            <div class="count-input-wrap">
+              <input type="text" id="count-input-${row.id}" class="count-input" value="${escapeHtml(row.count)}"
+                oninput="onCountTextInput('${modalCategory}', '${row.id}', this.value)"
+                onkeydown="handleCountEnter(event, ${idx})" />
+              <span style="font-size:12.5px; font-weight:700; color:#475569;">마리 · ${srv}인분</span>
+            </div>
+            <div class="preset-chips">${chipsHtml}</div>
+          </div>
+          <div class="edit-row-preview">
+            <input type="text" id="label-input-${row.id}" class="preview-label-input" value="${escapeHtml(displayLabel)}"
+              oninput="onCustomLabelInput('${modalCategory}', '${row.id}', this.value)" />
+            ${isCustom
+              ? `<button type="button" class="reset-label-btn" onclick="resetCustomLabel('${modalCategory}', '${row.id}')">↺ 자동 조합 복귀</button>`
+              : `<span style="font-size:11px; color:#94a3b8; white-space:nowrap;">옵션명 직접 수정 가능</span>`}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  window.setRowCount = (cat, id, countVal) => {
+    const rowsKey = cat === "snow" ? "snowRows" : "kingRows";
+    const row = priceState[rowsKey].find(r => r.id === id);
+    if (!row) return;
+    row.count = countVal;
+    row.customLabel = "";
+    scheduleCloudSave("prices", priceState);
+    renderPriceCard(cat);
+    renderCountModal();
+  };
+
+  window.onCountTextInput = (cat, id, val) => {
+    const rowsKey = cat === "snow" ? "snowRows" : "kingRows";
+    const row = priceState[rowsKey].find(r => r.id === id);
+    if (!row) return;
+    row.count = val;
+    row.customLabel = "";
+    scheduleCloudSave("prices", priceState);
+    renderPriceCard(cat);
+    const labelInput = document.getElementById(`label-input-${id}`);
+    if (labelInput) labelInput.value = getDisplayLabel(cat, row);
+  };
+
+  window.onCustomLabelInput = (cat, id, val) => {
+    const rowsKey = cat === "snow" ? "snowRows" : "kingRows";
+    const row = priceState[rowsKey].find(r => r.id === id);
+    if (!row) return;
+    const auto = getAutoLabel(cat, row);
+    row.customLabel = val.trim() === auto ? "" : val;
+    scheduleCloudSave("prices", priceState);
+    renderPriceCard(cat);
+  };
+
+  window.resetCustomLabel = (cat, id) => {
+    const rowsKey = cat === "snow" ? "snowRows" : "kingRows";
+    const row = priceState[rowsKey].find(r => r.id === id);
+    if (!row) return;
+    row.customLabel = "";
+    scheduleCloudSave("prices", priceState);
+    renderPriceCard(cat);
+    renderCountModal();
+  };
+
+  window.handleCountEnter = (event, idx) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    const rowsKey = modalCategory === "snow" ? "snowRows" : "kingRows";
+    const nextRow = priceState[rowsKey][idx + 1];
+    if (nextRow) {
+      const nextInput = document.getElementById(`count-input-${nextRow.id}`);
+      if (nextInput) { nextInput.focus(); nextInput.select(); }
+    } else {
+      closeCountModal();
+    }
+  };
+
+  /* =========================================================================
+     TAB 2: 마진계산 로직
+     ========================================================================= */
+  const MARGIN_FIELDS = ["sales", "cost", "packaging", "cpCoupon", "bmCoupon", "cpBrokerage", "cpPg", "cpDelivery", "bmBrokerage", "bmPg", "bmDelivery"];
+
+  function applyMarginStateToInputs() {
+    MARGIN_FIELDS.forEach(f => {
+      const el = document.getElementById(`m_${f}`);
+      if (el) el.value = marginState[f];
+    });
+    updateMarginView();
+  }
+
+  document.getElementById("m_toggleSettings").addEventListener("click", () => {
+    const body = document.getElementById("m_settingsBody");
+    const isOpen = body.classList.toggle("open");
+    document.getElementById("m_arrow").textContent = isOpen ? "▲" : "▼";
+  });
+
+  function calcPlatformMargin(sales, coupon, cost, packaging, bRate, pgRate, delivery, isBaemin) {
+    const brokerage = Math.round(sales * (bRate / 100));
+    const actualPay = Math.max(0, sales - coupon);
+    const pg = Math.round(actualPay * (pgRate / 100));
+    const totalFees = brokerage + pg + delivery;
+    const vat = isBaemin ? Math.floor(totalFees * 0.1) : Math.round(totalFees * 0.1);
+    const settlement = sales - coupon - totalFees - vat;
+    const totalCost = cost + packaging;
+    const netProfit = settlement - totalCost;
+    const costRate = sales > 0 ? (totalCost / sales) * 100 : 0;
+    const marginRate = sales > 0 ? (netProfit / sales) * 100 : 0;
+    const deduction = coupon + totalFees + vat;
+    return { sales, coupon, brokerage, pg, delivery, vat, settlement, totalCost, netProfit, costRate, marginRate, deduction };
+  }
+
+  function renderMarginBar(el, d) {
+    if (d.sales <= 0) { el.innerHTML = ""; return; }
+    const cPct = Math.min(100, (d.totalCost / d.sales) * 100);
+    const fPct = Math.min(100 - cPct, Math.max(0, (d.deduction / d.sales) * 100));
+    const pPct = Math.max(0, 100 - cPct - fPct);
+    el.innerHTML = `
+      <div class="m-bar-seg" style="width:${cPct}%; background:var(--cost)">${cPct >= 10 ? cPct.toFixed(1) + "%" : ""}</div>
+      <div class="m-bar-seg" style="width:${fPct}%; background:var(--fee)">${fPct >= 10 ? fPct.toFixed(1) + "%" : ""}</div>
+      <div class="m-bar-seg" style="width:${pPct}%; background:var(--profit)">${pPct >= 10 ? d.marginRate.toFixed(1) + "%" : ""}</div>
+    `;
+  }
+
+  function updateMarginView() {
+    const won = (v) => v.toLocaleString("ko-KR") + "원";
+    const s = marginState;
+    const cp = calcPlatformMargin(s.sales, s.cpCoupon, s.cost, s.packaging, s.cpBrokerage, s.cpPg, s.cpDelivery, false);
+    const bm = calcPlatformMargin(s.sales, s.bmCoupon, s.cost, s.packaging, s.bmBrokerage, s.bmPg, s.bmDelivery, true);
+
+    const diff = bm.netProfit - cp.netProfit;
+    const banner = document.getElementById("m_banner");
+    if (diff > 0) {
+      banner.className = "m-banner bm";
+      banner.textContent = `배달의민족이 건당 ${diff.toLocaleString("ko-KR")}원 더 남습니다.`;
+    } else if (diff < 0) {
+      banner.className = "m-banner cp";
+      banner.textContent = `쿠팡이츠가 건당 ${Math.abs(diff).toLocaleString("ko-KR")}원 더 남습니다.`;
+    } else {
+      banner.className = "m-banner tie";
+      banner.textContent = "두 플랫폼의 순수익이 동일합니다.";
+    }
+
+    renderMarginBar(document.getElementById("m_cpBar"), cp);
+    renderMarginBar(document.getElementById("m_bmBar"), bm);
+
+    const rows = [
+      ["매출액", won(cp.sales), won(bm.sales), ""],
+      ["상점부담 쿠폰할인", won(-cp.coupon), won(-bm.coupon), ""],
+      ["중개이용료", won(-cp.brokerage), won(-bm.brokerage), ""],
+      ["결제수수료", won(-cp.pg), won(-bm.pg), ""],
+      ["배달비", won(-cp.delivery), won(-bm.delivery), ""],
+      ["부가세", won(-cp.vat), won(-bm.vat), ""],
+      ["정산예정금액", won(cp.settlement), won(bm.settlement), "row-sub"],
+      ["원가 + 포장비", won(-cp.totalCost), won(-bm.totalCost), ""],
+      ["순수익", won(cp.netProfit), won(bm.netProfit), "row-profit", true],
+      ["원가율 (%)", cp.costRate.toFixed(2) + "%", bm.costRate.toFixed(2) + "%", "row-costrate"],
+      ["마진율 (%)", cp.marginRate.toFixed(2) + "%", bm.marginRate.toFixed(2) + "%", "row-margin", true]
+    ];
+
+    document.getElementById("m_resultTable").innerHTML = rows.map(([label, v1, v2, cls, colorize]) => {
+      const c1 = colorize ? (cp.netProfit < 0 ? "neg" : "pos") : "";
+      const c2 = colorize ? (bm.netProfit < 0 ? "neg" : "pos") : "";
+      return `<tr class="${cls}"><td>${label}</td><td class="${c1}">${v1}</td><td class="${c2}">${v2}</td></tr>`;
+    }).join("");
+  }
+
+  MARGIN_FIELDS.forEach(f => {
+    const el = document.getElementById(`m_${f}`);
+    if (!el) return;
+    el.addEventListener("input", () => {
+      marginState[f] = Math.max(0, parseFloat(el.value) || 0);
+      scheduleCloudSave("margin", marginState);
+      updateMarginView();
+    });
+  });
+
+  /* =========================================================================
+     TAB 3: 매입입금관리 로직
+     ========================================================================= */
+  let ledgerYear = "2026";
+  let ledgerMonth = 11;
+
+  const fmtWon = (n) => n.toLocaleString("ko-KR") + "원";
+  const fmtPay = (n) => (n > 0 ? "+" : "") + n.toLocaleString("ko-KR") + "원";
+  const fmtDebt = (bal) => bal === 0 ? "0원" : (bal > 0 ? "+" : "-") + Math.abs(bal).toLocaleString("ko-KR") + "원";
+
+  function computeLedgerYearStats(yearStr) {
+    const prevYearStr = String(Number(yearStr) - 1);
+    const carryOverBalance = ledgerDB[prevYearStr] ? computeLedgerYearStats(prevYearStr).endingBalance : 0;
+    const yearData = ledgerDB[yearStr];
+    let totalBuy = 0, totalPay = 0, pureBuy = 0, purePay = 0;
+    let runningBalance = carryOverBalance;
+    const months = [];
+
+    for (let m = 1; m <= 12; m++) {
+      const mData = yearData[m];
+      const bSum = mData.buys.reduce((s, x) => s + x.a, 0);
+      const pSum = mData.pays.reduce((s, x) => s + x.a, 0);
+      const pB = mData.buys.filter(x => x.d !== "전년" && x.d !== "미수").reduce((s, x) => s + x.a, 0);
+      const pP = mData.pays.filter(x => x.d !== "전년").reduce((s, x) => s + x.a, 0);
+      const monthBalance = pSum - bSum;
+      runningBalance += monthBalance;
+      totalBuy += bSum; totalPay += pSum; pureBuy += pB; purePay += pP;
+      months.push({ m, bSum, pSum, pureBuy: pB, purePay: pP, monthBalance, runningBalance });
+    }
+    return { carryOverBalance, totalBuy, totalPay, pureBuy, purePay, endingBalance: runningBalance, months };
+  }
+
+  function renderLedger() {
+    const years = Object.keys(ledgerDB).sort((a, b) => Number(b) - Number(a));
+    if (!ledgerDB[ledgerYear]) ledgerYear = years[0];
+    document.getElementById("l_yearSelect").innerHTML = years.map(y => `<option value="${y}" ${y === ledgerYear ? "selected" : ""}>${y}년</option>`).join("");
+
+    const curStats = computeLedgerYearStats(ledgerYear);
+    const prevYearStr = String(Number(ledgerYear) - 1);
+    const prevStats = ledgerDB[prevYearStr] ? computeLedgerYearStats(prevYearStr) : null;
+
+    document.getElementById("l_kpiBuy").textContent = fmtWon(curStats.pureBuy);
+    document.getElementById("l_kpiPay").textContent = fmtPay(curStats.purePay);
+    document.getElementById("l_kpiDebt").textContent = fmtDebt(curStats.endingBalance);
+    document.getElementById("l_kpiCarry").textContent = prevStats ? `${prevYearStr}년 이월 미수금: ${fmtDebt(curStats.carryOverBalance)}` : "전년 이월 자동 연동 기준 연도";
+
+    if (prevStats && prevStats.pureBuy > 0) {
+      const bDiff = curStats.pureBuy - prevStats.pureBuy;
+      const bPct = (bDiff / prevStats.pureBuy) * 100;
+      const sign = bDiff >= 0 ? "+" : "";
+      const cls = bDiff >= 0 ? "c-buy" : "c-debt";
+      document.getElementById("l_kpiBuyDiff").innerHTML = `${prevYearStr}년 대비 <span class="${cls}">${sign}${bDiff.toLocaleString("ko-KR")}원 (${sign}${bPct.toFixed(1)}%)</span>`;
+    } else {
+      document.getElementById("l_kpiBuyDiff").textContent = "전년도 비교 데이터 없음";
+    }
+
+    if (prevStats && prevStats.purePay > 0) {
+      const pDiff = curStats.purePay - prevStats.purePay;
+      const pPct = (pDiff / prevStats.purePay) * 100;
+      const sign = pDiff >= 0 ? "+" : "";
+      const cls = pDiff >= 0 ? "c-pay" : "c-debt";
+      document.getElementById("l_kpiPayDiff").innerHTML = `${prevYearStr}년 대비 <span class="${cls}">${sign}${pDiff.toLocaleString("ko-KR")}원 (${sign}${pPct.toFixed(1)}%)</span>`;
+    } else {
+      document.getElementById("l_kpiPayDiff").textContent = "전년도 비교 데이터 없음";
+    }
+
+    document.getElementById("l_summaryBody").innerHTML = curStats.months.map((r, idx) => {
+      let yoyHtml = "-";
+      if (prevStats) {
+        const prevB = prevStats.months[idx].pureBuy;
+        if (prevB > 0 && r.pureBuy > 0) {
+          const diff = r.pureBuy - prevB;
+          const pct = (diff / prevB) * 100;
+          const sign = diff >= 0 ? "+" : "";
+          const cls = diff >= 0 ? "c-pay" : "c-debt";
+          yoyHtml = `<span class="${cls}">${sign}${diff.toLocaleString("ko-KR")}원 (${sign}${pct.toFixed(1)}%)</span>`;
+        }
+      }
+      return `
+        <tr class="clickable ${r.m === ledgerMonth ? "selected" : ""}" onclick="selectLedgerMonth(${r.m})">
+          <td>${r.m}월</td>
+          <td class="c-buy">${fmtWon(r.bSum)}</td>
+          <td class="c-pay">${fmtPay(r.pSum)}</td>
+          <td class="${r.monthBalance < 0 ? "c-debt" : "c-pay"}">${fmtDebt(r.monthBalance)}</td>
+          <td class="${r.runningBalance < 0 ? "c-debt" : "c-pay"}">${fmtDebt(r.runningBalance)}</td>
+          <td>${yoyHtml}</td>
+        </tr>
+      `;
+    }).join("");
+
+    const excludeCarry = document.getElementById("l_excludeCarry").checked;
+    const chartRows = curStats.months.map(r => ({
+      m: r.m,
+      b: excludeCarry ? r.pureBuy : r.bSum,
+      p: excludeCarry ? r.purePay : r.pSum
+    }));
+    const maxVal = Math.max(1, ...chartRows.flatMap(r => [r.b, r.p]));
+    document.getElementById("l_chartBars").innerHTML = chartRows.map(r => `
+      <div class="bar-col ${r.m === ledgerMonth ? "active" : ""}" onclick="selectLedgerMonth(${r.m})" title="${r.m}월 매입 ${fmtWon(r.b)} / 입금 ${fmtPay(r.p)}">
+        <div class="bar-pair">
+          <div class="bar buy" style="height:${Math.round((r.b / maxVal) * 100)}%"></div>
+          <div class="bar pay" style="height:${Math.round((r.p / maxVal) * 100)}%"></div>
+        </div>
+        <div class="bar-m">${r.m}월</div>
+      </div>
+    `).join("");
+
+    const cur = ledgerDB[ledgerYear][ledgerMonth];
+    document.getElementById("l_detailTitle").textContent = `${ledgerYear}년 ${ledgerMonth}월 상세 거래내역 (셀 클릭 시 수정)`;
+    document.getElementById("l_detailBuySum").textContent = fmtWon(cur.buys.reduce((s, x) => s + x.a, 0));
+    document.getElementById("l_detailPaySum").textContent = fmtPay(cur.pays.reduce((s, x) => s + x.a, 0));
+
+    document.getElementById("l_detailBuyBody").innerHTML = cur.buys.length ? cur.buys.map((item, idx) => `
+      <tr>
+        <td class="edit-cell" style="text-align:left;" onclick="editLedgerItem('buys', ${idx}, 'd')">${item.d}</td>
+        <td class="edit-cell c-buy" onclick="editLedgerItem('buys', ${idx}, 'a')">${fmtWon(item.a)}</td>
+        <td><button class="del-btn" onclick="deleteLedgerItem('buys', ${idx})">✕</button></td>
+      </tr>
+    `).join("") : `<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding:18px;">매입 내역 없음</td></tr>`;
+
+    document.getElementById("l_detailPayBody").innerHTML = cur.pays.length ? cur.pays.map((item, idx) => `
+      <tr>
+        <td class="edit-cell" style="text-align:left;" onclick="editLedgerItem('pays', ${idx}, 'd')">${item.d}</td>
+        <td class="edit-cell c-pay" onclick="editLedgerItem('pays', ${idx}, 'a')">${fmtPay(item.a)}</td>
+        <td><button class="del-btn" onclick="deleteLedgerItem('pays', ${idx})">✕</button></td>
+      </tr>
+    `).join("") : `<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding:18px;">입금 내역 없음</td></tr>`;
+  }
+
+  window.selectLedgerMonth = (m) => {
+    ledgerMonth = m;
+    document.getElementById("l_buyMonth").value = m;
+    document.getElementById("l_payMonth").value = m;
+    renderLedger();
+  };
+
+  window.editLedgerItem = (type, idx, field) => {
+    const item = ledgerDB[ledgerYear][ledgerMonth][type][idx];
+    const label = field === "d" ? "일자" : (type === "buys" ? "매입액" : "입금액");
+    promptAction(`${label} 수정`, `${ledgerYear}년 ${ledgerMonth}월 거래 내역의 ${label}을 입력하세요.`, item[field], (val) => {
+      if (field === "d") {
+        item.d = val.trim() || item.d;
+      } else {
+        const num = parseInt(val.replace(/,/g, ""), 10);
+        if (!isNaN(num) && num >= 0) item.a = num;
+      }
+      scheduleCloudSave("ledger", ledgerDB);
+      renderLedger();
+    });
+  };
+
+  window.deleteLedgerItem = (type, idx) => {
+    ledgerDB[ledgerYear][ledgerMonth][type].splice(idx, 1);
+    scheduleCloudSave("ledger", ledgerDB);
+    preserveScrollRender(renderLedger);
+  };
+
+  document.getElementById("l_addBuyBtn").addEventListener("click", () => {
+    const m = parseInt(document.getElementById("l_buyMonth").value, 10);
+    const d = document.getElementById("l_buyDay").value.trim() || "1";
+    const a = parseInt(document.getElementById("l_buyAmt").value, 10) || 0;
+    if (a <= 0) return;
+    ledgerDB[ledgerYear][m].buys.push({ d, a });
+    document.getElementById("l_buyAmt").value = "";
+    ledgerMonth = m;
+    scheduleCloudSave("ledger", ledgerDB);
+    preserveScrollRender(renderLedger);
+  });
+
+  document.getElementById("l_addPayBtn").addEventListener("click", () => {
+    const m = parseInt(document.getElementById("l_payMonth").value, 10);
+    const d = document.getElementById("l_payDay").value.trim() || "1";
+    const a = parseInt(document.getElementById("l_payAmt").value, 10) || 0;
+    if (a <= 0) return;
+    ledgerDB[ledgerYear][m].pays.push({ d, a });
+    document.getElementById("l_payAmt").value = "";
+    ledgerMonth = m;
+    scheduleCloudSave("ledger", ledgerDB);
+    preserveScrollRender(renderLedger);
+  });
+
+  document.getElementById("l_buyAmt").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); document.getElementById("l_addBuyBtn").click(); }
+  });
+  document.getElementById("l_payAmt").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); document.getElementById("l_addPayBtn").click(); }
+  });
+
+  function stepLedgerYear(delta) {
+    const years = Object.keys(ledgerDB).sort((a, b) => Number(b) - Number(a));
+    const idx = years.indexOf(ledgerYear);
+    const nextIdx = Math.min(years.length - 1, Math.max(0, idx + delta));
+    if (nextIdx !== idx) { ledgerYear = years[nextIdx]; renderLedger(); }
+  }
+
+  document.getElementById("l_yearSelect").addEventListener("change", (e) => { ledgerYear = e.target.value; renderLedger(); });
+  document.getElementById("l_yearUp").addEventListener("click", () => stepLedgerYear(-1));
+  document.getElementById("l_yearDown").addEventListener("click", () => stepLedgerYear(1));
+  document.getElementById("l_yearPicker").addEventListener("wheel", (e) => { e.preventDefault(); stepLedgerYear(e.deltaY > 0 ? 1 : -1); }, { passive: false });
+
+  document.getElementById("l_addYearBtn").addEventListener("click", () => {
+    const maxYear = Math.max(...Object.keys(ledgerDB).map(Number));
+    const nextY = String(maxYear + 1);
+    ledgerDB[nextY] = makeEmptyLedgerYear();
+    ledgerYear = nextY;
+    ledgerMonth = 1;
+    scheduleCloudSave("ledger", ledgerDB);
+    renderLedger();
+    showToast(`${nextY}년 매입·입금 장부가 추가되었습니다`);
+  });
+
+  document.getElementById("l_delYearBtn").addEventListener("click", () => {
+    const years = Object.keys(ledgerDB).sort((a, b) => Number(b) - Number(a));
+    if (years.length <= 1) { showToast("최소 1개 연도는 남겨두어야 합니다"); return; }
+    confirmAction(`${ledgerYear}년 데이터를 삭제할까요?`, "삭제된 연도의 매입·입금 기록은 복구할 수 없습니다.", () => {
+      delete ledgerDB[ledgerYear];
+      ledgerYear = Object.keys(ledgerDB).sort((a, b) => Number(b) - Number(a))[0];
+      scheduleCloudSave("ledger", ledgerDB);
+      renderLedger();
+    });
+  });
+
+  document.getElementById("l_excludeCarry").addEventListener("change", renderLedger);
+  document.getElementById("l_resetData").addEventListener("click", () => {
+    confirmAction("매입·입금 장부를 원본으로 초기화할까요?", "수정된 내용을 모두 지우고 기본 데이터로 되돌립니다.", () => {
+      ledgerDB = clone(INITIAL_LEDGER_DATA);
+      ledgerYear = "2026";
+      ledgerMonth = 11;
+      scheduleCloudSave("ledger", ledgerDB);
+      renderLedger();
+      showToast("매입·입금 장부가 초기화되었습니다");
+    });
+  });
+
+  document.getElementById("l_exportCsv").addEventListener("click", () => {
+    const yearData = ledgerDB[ledgerYear];
+    let csv = "\uFEFF연도,월,구분,일자,금액\n";
+    for (let m = 1; m <= 12; m++) {
+      yearData[m].buys.forEach(x => csv += `${ledgerYear},${m}월,매입,${x.d},${x.a}\n`);
+      yearData[m].pays.forEach(x => csv += `${ledgerYear},${m}월,입금,${x.d},${x.a}\n`);
+    }
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `수산매입입금_${ledgerYear}.csv`;
+    a.click();
+  });
+
+  /* =========================================================================
+     TAB 4: 연간총판매 로직
+     ========================================================================= */
+  let salesYear = "2026";
+  let salesMonth = 11;
+  const daysInMonth = (year, month) => new Date(year, month, 0).getDate();
+  const fmtKg = (n) => n.toFixed(2) + "kg";
+
+  function getMonthSalesTotals(yearStr, m) {
+    const yData = salesDB[yearStr];
+    if (!yData || !yData[m]) return { s: 0, k: 0, total: 0, hasDaily: false };
+    const mObj = yData[m];
+    const entries = Object.values(mObj.days || {});
+    const hasDaily = entries.some(v => (v.s || 0) > 0 || (v.k || 0) > 0);
+    if (hasDaily) {
+      const s = entries.reduce((acc, v) => acc + (v.s || 0), 0);
+      const k = entries.reduce((acc, v) => acc + (v.k || 0), 0);
+      return { s, k, total: s + k, hasDaily: true };
+    }
+    if (mObj.fallback) {
+      return { s: mObj.fallback.s, k: mObj.fallback.k, total: mObj.fallback.s + mObj.fallback.k, hasDaily: false };
+    }
+    return { s: 0, k: 0, total: 0, hasDaily: false };
+  }
+
+  function updateSalesDaySelect() {
+    const y = Number(salesYear);
+    const m = Number(document.getElementById("s_inMonth").value);
+    const maxD = daysInMonth(y, m);
+    const prevD = Math.min(Number(document.getElementById("s_inDay").value) || 1, maxD);
+    document.getElementById("s_inDay").innerHTML = Array.from({ length: maxD }, (_, i) => `<option value="${i + 1}">${i + 1}일</option>`).join("");
+    document.getElementById("s_inDay").value = prevD;
+    updateSalesInputPlaceholders();
+  }
+
+  function updateSalesInputPlaceholders() {
+    const m = Number(document.getElementById("s_inMonth").value);
+    const d = Number(document.getElementById("s_inDay").value);
+    const rec = (salesDB[salesYear] && salesDB[salesYear][m] && salesDB[salesYear][m].days[d]) || { s: 0, k: 0 };
+    const sInp = document.getElementById("s_inSnow");
+    const kInp = document.getElementById("s_inKing");
+    if (sInp) sInp.placeholder = rec.s > 0 ? `현재 ${rec.s.toFixed(2)}kg (새 중량 입력)` : "대게 중량 입력";
+    if (kInp) kInp.placeholder = rec.k > 0 ? `현재 ${rec.k.toFixed(2)}kg (새 중량 입력)` : "킹크랩 중량 입력";
+  }
+
+  function renderSales() {
+    const years = Object.keys(salesDB).sort((a, b) => Number(b) - Number(a));
+    if (!salesDB[salesYear]) salesYear = years[0];
+    document.getElementById("s_yearSelect").innerHTML = years.map(y => `<option value="${y}" ${y === salesYear ? "selected" : ""}>${y}년</option>`).join("");
+
+    document.getElementById("s_monthPills").innerHTML = Array.from({ length: 12 }, (_, i) => {
+      const m = i + 1;
+      return `<button type="button" class="month-pill-btn ${m === salesMonth ? "active" : ""}" onclick="selectSalesMonth(${m})">${m}월</button>`;
+    }).join("");
+
+    const prevYear = String(Number(salesYear) - 1);
+    const hasPrevYear = Boolean(salesDB[prevYear]);
+    let ySnow = 0, yKing = 0, yTotal = 0, prevTotalAll = 0, prevSamePeriod = 0;
+    const rows = [];
+
+    for (let m = 1; m <= 12; m++) {
+      const cur = getMonthSalesTotals(salesYear, m);
+      const prev = hasPrevYear ? getMonthSalesTotals(prevYear, m) : { s: 0, k: 0, total: 0 };
+      ySnow += cur.s; yKing += cur.k; yTotal += cur.total; prevTotalAll += prev.total;
+      if (cur.total > 0) prevSamePeriod += prev.total;
+      rows.push({ m, ...cur, prevTotal: prev.total });
+    }
+
+    document.getElementById("s_kpiSnow").textContent = fmtKg(ySnow);
+    document.getElementById("s_kpiKing").textContent = fmtKg(yKing);
+    document.getElementById("s_kpiSnowShare").textContent = `전체 비중 ${yTotal > 0 ? ((ySnow / yTotal) * 100).toFixed(1) : "0.0"}%`;
+    document.getElementById("s_kpiKingShare").textContent = `전체 비중 ${yTotal > 0 ? ((yKing / yTotal) * 100).toFixed(1) : "0.0"}%`;
+    document.getElementById("s_kpiTotal").textContent = fmtKg(yTotal);
+    document.getElementById("s_kpiPrevTotal").textContent = hasPrevYear ? fmtKg(prevTotalAll) : "데이터 없음";
+
+    if (hasPrevYear && prevSamePeriod > 0) {
+      const spDiff = yTotal - prevSamePeriod;
+      const spPct = (spDiff / prevSamePeriod) * 100;
+      const cls = spDiff >= 0 ? "up" : "down";
+      const sign = spDiff >= 0 ? "+" : "";
+      document.getElementById("s_kpiSamePeriod").innerHTML = `작년 동기간 대비 <span class="${cls}">${sign}${spDiff.toFixed(2)}kg (${sign}${spPct.toFixed(1)}%)</span>`;
+    } else {
+      document.getElementById("s_kpiSamePeriod").textContent = "작년 동기간 비교 데이터 없음";
+    }
+
+    if (hasPrevYear && prevTotalAll > 0) {
+      const allDiff = yTotal - prevTotalAll;
+      const allPct = (allDiff / prevTotalAll) * 100;
+      const cls = allDiff >= 0 ? "up" : "down";
+      const sign = allDiff >= 0 ? "+" : "";
+      document.getElementById("s_kpiPrevDiff").innerHTML = `작년 총 판매량 대비 <span class="${cls}">${sign}${allDiff.toFixed(2)}kg (${sign}${allPct.toFixed(1)}%)</span>`;
+    } else {
+      document.getElementById("s_kpiPrevDiff").textContent = "전년도 데이터 없음";
+    }
+
+    const maxVal = Math.max(1, ...rows.flatMap(r => [r.total, r.prevTotal]));
+    document.getElementById("s_chartBars").innerHTML = rows.map(r => {
+      const sH = Math.round((r.s / maxVal) * 100);
+      const kH = Math.round((r.k / maxVal) * 100);
+      const pH = Math.round((r.prevTotal / maxVal) * 100);
+      return `
+        <div class="bar-col ${r.m === salesMonth ? "active" : ""}" onclick="selectSalesMonth(${r.m})"
+             title="${r.m}월 대게 ${fmtKg(r.s)} / 킹크랩 ${fmtKg(r.k)} / 합계 ${fmtKg(r.total)} (작년 ${fmtKg(r.prevTotal)})">
+          <div class="bar-group">
+            <div class="stack" style="height:100%;">
+              <div class="seg-snow" style="height:${sH}%"></div>
+              <div class="seg-king" style="height:${kH}%"></div>
+            </div>
+            <div class="bar-prev" style="height:${pH}%"></div>
+          </div>
+          <div class="bar-m">${r.m}월</div>
+        </div>
+      `;
+    }).join("");
+
+    document.getElementById("s_summaryBody").innerHTML = rows.map(r => {
+      let diffHtml = "-";
+      if (hasPrevYear && r.prevTotal > 0 && r.total > 0) {
+        const diff = r.total - r.prevTotal;
+        const pct = (diff / r.prevTotal) * 100;
+        const cls = diff >= 0 ? "up" : "down";
+        const sign = diff >= 0 ? "+" : "";
+        diffHtml = `<span class="${cls}">${sign}${diff.toFixed(2)}kg (${sign}${pct.toFixed(1)}%)</span>`;
+      }
+      return `
+        <tr class="clickable ${r.m === salesMonth ? "selected" : ""}" onclick="selectSalesMonth(${r.m})">
+          <td>${r.m}월</td>
+          <td class="c-snow">${fmtKg(r.s)}</td>
+          <td class="c-king">${fmtKg(r.k)}</td>
+          <td><strong>${fmtKg(r.total)}</strong></td>
+          <td style="color:#64748b;">${hasPrevYear ? fmtKg(r.prevTotal) : "-"}</td>
+          <td>${diffHtml}</td>
+        </tr>
+      `;
+    }).join("");
+
+    const maxD = daysInMonth(Number(salesYear), salesMonth);
+    const mObj = salesDB[salesYear][salesMonth];
+    const mTot = getMonthSalesTotals(salesYear, salesMonth);
+    document.getElementById("s_dailyTitle").textContent = `${salesYear}년 ${salesMonth}월 일별 판매량 (1~${maxD}일 · 셀 클릭 시 수정)`;
+    document.getElementById("s_dailyNotice").textContent = (!mTot.hasDaily && mObj.fallback)
+      ? `일별 미입력 상태 (월 합계 대게 ${fmtKg(mObj.fallback.s)} / 킹크랩 ${fmtKg(mObj.fallback.k)} 반영 중)`
+      : "";
+
+    const ranges = [[1, 10], [11, 20], [21, maxD]];
+    document.getElementById("s_dailyCols").innerHTML = ranges.map(([start, end]) => {
+      let body = "";
+      for (let d = start; d <= end; d++) {
+        const rec = mObj.days[d] || { s: 0, k: 0 };
+        const sTxt = rec.s > 0 ? rec.s.toFixed(2) + "kg" : "";
+        const kTxt = rec.k > 0 ? rec.k.toFixed(2) + "kg" : "";
+        body += `
+          <tr>
+            <td class="day-cell">${d}일</td>
+            <td class="edit-cell c-snow ${rec.s > 0 ? "" : "empty-slot"}" onclick="editSalesCell(${d}, 's')">${sTxt}</td>
+            <td class="edit-cell c-king ${rec.k > 0 ? "" : "empty-slot"}" onclick="editSalesCell(${d}, 'k')">${kTxt}</td>
+          </tr>
+        `;
+      }
+      return `
+        <table class="daily-table">
+          <thead><tr><th>일자</th><th style="color:var(--snow-blue)">대게</th><th style="color:var(--king-orange)">킹크랩</th></tr></thead>
+          <tbody>${body}</tbody>
+        </table>
+      `;
+    }).join("");
+  }
+
+  window.selectSalesMonth = (m) => {
+    salesMonth = m;
+    document.getElementById("s_inMonth").value = m;
+    updateSalesDaySelect();
+    preserveScrollRender(renderSales);
+  };
+
+  window.editSalesCell = (day, field) => {
+    const mObj = salesDB[salesYear][salesMonth];
+    const cur = mObj.days[day] || { s: 0, k: 0 };
+    const label = field === "s" ? "대게 (kg)" : "킹크랩 (kg)";
+    promptAction(`${salesYear}년 ${salesMonth}월 ${day}일 ${label}`, "판매 중량(kg)을 입력하세요. (비우면 0kg)", cur[field] > 0 ? cur[field] : "", (val) => {
+      const num = val.trim() === "" ? 0 : parseFloat(val);
+      if (isNaN(num) || num < 0) return;
+      if (!mObj.days[day]) mObj.days[day] = { s: 0, k: 0 };
+      mObj.days[day][field] = Math.round(num * 100) / 100;
+      scheduleCloudSave("sales", salesDB);
+      preserveScrollRender(renderSales);
+    });
+  };
+
+  document.getElementById("s_saveDayBtn").addEventListener("click", () => {
+    const m = Number(document.getElementById("s_inMonth").value);
+    const d = Number(document.getElementById("s_inDay").value);
+    const s = parseFloat(document.getElementById("s_inSnow").value) || 0;
+    const k = parseFloat(document.getElementById("s_inKing").value) || 0;
+    salesDB[salesYear][m].days[d] = { s: Math.round(s * 100) / 100, k: Math.round(k * 100) / 100 };
+    document.getElementById("s_inSnow").value = "";
+    document.getElementById("s_inKing").value = "";
+    salesMonth = m;
+    scheduleCloudSave("sales", salesDB);
+    preserveScrollRender(renderSales);
+    updateSalesInputPlaceholders();
+    showToast(`${m}월 ${d}일 판매량이 저장되었습니다`);
+  });
+
+  document.getElementById("s_inSnow").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); document.getElementById("s_saveDayBtn").click(); }
+  });
+  document.getElementById("s_inKing").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); document.getElementById("s_saveDayBtn").click(); }
+  });
+  document.getElementById("s_inDay").addEventListener("change", updateSalesInputPlaceholders);
+
+  document.getElementById("s_inMonth").addEventListener("change", () => {
+    salesMonth = Number(document.getElementById("s_inMonth").value);
+    updateSalesDaySelect();
+    preserveScrollRender(renderSales);
+  });
+
+  function stepSalesYear(delta) {
+    const years = Object.keys(salesDB).sort((a, b) => Number(b) - Number(a));
+    const idx = years.indexOf(salesYear);
+    const nextIdx = Math.min(years.length - 1, Math.max(0, idx + delta));
+    if (nextIdx !== idx) { salesYear = years[nextIdx]; updateSalesDaySelect(); renderSales(); }
+  }
+
+  document.getElementById("s_yearSelect").addEventListener("change", (e) => { salesYear = e.target.value; updateSalesDaySelect(); renderSales(); });
+  document.getElementById("s_yearUp").addEventListener("click", () => stepSalesYear(-1));
+  document.getElementById("s_yearDown").addEventListener("click", () => stepSalesYear(1));
+  document.getElementById("s_yearPicker").addEventListener("wheel", (e) => { e.preventDefault(); stepSalesYear(e.deltaY > 0 ? 1 : -1); }, { passive: false });
+
+  document.getElementById("s_addYearBtn").addEventListener("click", () => {
+    const maxYear = Math.max(...Object.keys(salesDB).map(Number));
+    const nextY = String(maxYear + 1);
+    salesDB[nextY] = makeEmptySalesYear();
+    salesYear = nextY;
+    updateSalesDaySelect();
+    scheduleCloudSave("sales", salesDB);
+    renderSales();
+    showToast(`${nextY}년 판매량 장부가 추가되었습니다`);
+  });
+
+  document.getElementById("s_delYearBtn").addEventListener("click", () => {
+    const years = Object.keys(salesDB).sort((a, b) => Number(b) - Number(a));
+    if (years.length <= 1) { showToast("최소 1개 연도는 남겨두어야 합니다"); return; }
+    confirmAction(`${salesYear}년 판매량 데이터를 삭제할까요?`, "삭제된 연도의 일별·월별 판매 기록은 복구할 수 없습니다.", () => {
+      delete salesDB[salesYear];
+      salesYear = Object.keys(salesDB).sort((a, b) => Number(b) - Number(a))[0];
+      updateSalesDaySelect();
+      scheduleCloudSave("sales", salesDB);
+      renderSales();
+    });
+  });
+
+  document.getElementById("s_resetBtn").addEventListener("click", () => {
+    confirmAction("연간 총 판매량을 원본으로 초기화할까요?", "2026년 1~11월 일별 구글시트 데이터 포함 기본값으로 되돌립니다.", () => {
+      salesDB = buildInitialSalesData();
+      salesYear = "2026";
+      salesMonth = 11;
+      scheduleCloudSave("sales", salesDB);
+      renderSales();
+      showToast("연간 총 판매량이 구글시트 원본으로 초기화되었습니다");
+    });
+  });
+
+  document.getElementById("s_exportCsvBtn").addEventListener("click", () => {
+    let csv = "\uFEFF연도,월,대게(kg),킹크랩(kg),월총판매량(kg)\n";
+    for (let m = 1; m <= 12; m++) {
+      const t = getMonthSalesTotals(salesYear, m);
+      csv += `${salesYear},${m}월,${t.s.toFixed(2)},${t.k.toFixed(2)},${t.total.toFixed(2)}\n`;
+    }
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `연간총판매량_${salesYear}.csv`;
+    a.click();
+  });
+
+  /* =========================================================================
+     초기화 및 실행
+     ========================================================================= */
+  const monthOpts = Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">${i + 1}월</option>`).join("");
+  document.getElementById("l_buyMonth").innerHTML = monthOpts;
+  document.getElementById("l_payMonth").innerHTML = monthOpts;
+  document.getElementById("l_buyMonth").value = ledgerMonth;
+  document.getElementById("l_payMonth").value = ledgerMonth;
+
+  document.getElementById("s_inMonth").innerHTML = monthOpts;
+  document.getElementById("s_inMonth").value = salesMonth;
+  updateSalesDaySelect();
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeCountModal();
+      closeCustomDialog();
+      closeChangePwdModal();
+    }
+  });
+
+  renderAllPrices();
+  applyMarginStateToInputs();
+  renderLedger();
+  renderSales();
+  initCloudSync();
+
+  document.addEventListener("gesturestart", (e) => e.preventDefault(), { passive: false });
+  document.addEventListener("gesturechange", (e) => e.preventDefault(), { passive: false });
+  document.addEventListener("touchmove", (e) => {
+    if (e.touches && e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+</script>
+</body>
+</html>
