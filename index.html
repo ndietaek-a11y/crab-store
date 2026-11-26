@@ -79,15 +79,21 @@
   /* Netlify 하단 배지/위젯 CSS 차단 */
   iframe[src*="netlify"],
   div[data-netlify-deploy-id],
-  a[href*="netlify.com"][style*="fixed"],
+  a[href*="netlify.com"],
+  a[href*="app.netlify.com"],
   [id*="netlify"],
-  [class*="netlify"] {
+  [class*="netlify"],
+  [data-netlify],
+  body > div:last-of-type:not(.modal-backdrop):not(.toast):not(.lock-screen) {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
     width: 0 !important;
     height: 0 !important;
+    max-width: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
   }
 
   html, body {
@@ -834,11 +840,117 @@
   }
 
   .m-field label {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
     font-size: 12.5px;
     font-weight: 700;
     color: #475569;
     margin-bottom: 6px;
+  }
+  .m-field.cp label { color: var(--cp); }
+  .m-field.bm label { color: var(--bm); }
+
+  .m-weight-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: #f8fafc;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+  }
+
+  .m-weight-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .m-weight-chips {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .m-w-chip {
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-strong);
+    background: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    color: #334155;
+    cursor: pointer;
+  }
+
+  .m-w-chip:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+  }
+
+  .m-water-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+
+  .m-water-btn:hover {
+    background: #dbeafe;
+  }
+
+  .m-water-btn.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+  }
+
+  .water-opt-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .water-opt-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 11px;
+    background: #f8fafc;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f172a;
+    transition: all 0.12s ease;
+  }
+
+  .water-opt-item:hover {
+    border-color: #60a5fa;
+    background: #eff6ff;
+  }
+
+  .water-opt-item.selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+    color: #1d4ed8;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.14);
   }
   .m-field.cp label { color: var(--cp); }
   .m-field.bm label { color: var(--bm); }
@@ -1274,8 +1386,8 @@
     justify-content: space-between;
   }
   .detail-table th, .detail-table td { padding: 8px 10px; }
-  .detail-table td.edit-cell, .daily-table td.edit-cell { cursor: pointer; border-radius: 6px; }
-  .detail-table td.edit-cell:hover, .daily-table td.edit-cell:hover { background: #f1f5f9; }
+  .detail-table td.edit-cell { cursor: pointer; border-radius: 6px; }
+  .detail-table td.edit-cell:hover { background: #f1f5f9; }
   .del-btn {
     border: none;
     background: none;
@@ -1285,34 +1397,6 @@
     padding: 2px 6px;
   }
   .del-btn:hover { color: var(--debt); }
-
-  /* 월별 빠른 선택 버튼 그리드 */
-  .month-pill-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 6px;
-  }
-  .month-pill-btn {
-    padding: 8px 4px;
-    border: 1.5px solid var(--border);
-    border-radius: 9px;
-    background: #f8fafc;
-    color: #334155;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.12s ease;
-  }
-  .month-pill-btn:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-  }
-  .month-pill-btn.active {
-    background: #2563eb;
-    border-color: #2563eb;
-    color: #ffffff;
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
-  }
 
   /* 일별 판매량 입력칸 가림막(Placeholder) & 경계선 시인성 강화 */
   .sales-input-box {
@@ -1386,52 +1470,270 @@
     background: #ffffff;
   }
 
-  .daily-cols {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-  }
-  .daily-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 4px;
-    font-size: 13px;
-  }
-  .daily-table th, .daily-table td {
-    padding: 7px 9px;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-  .daily-table th {
-    background: #f8fafc;
-    color: #475569;
-    font-weight: 700;
+  /* ==================== 달력형 일별 판매량 UI ==================== */
+  .cal-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--border);
   }
-  .daily-table th:first-child, .daily-table td:first-child { text-align: center; }
-  .day-cell { font-weight: 700; color: #475569; width: 48px; }
-  .daily-table td.edit-cell {
+
+  .cal-nav-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 7px;
-    min-height: 32px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 4px 6px;
   }
-  .daily-table td.edit-cell.empty-slot::after {
-    content: "입력";
-    color: #cbd5e1;
-    font-size: 11px;
-    font-weight: 600;
+
+  .cal-arrow-btn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--border);
+    background: #ffffff;
+    color: #0f172a;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.12s ease;
   }
-  .daily-table td.edit-cell:hover {
+
+  .cal-arrow-btn:hover {
     background: #eff6ff;
     border-color: #93c5fd;
+    color: #2563eb;
+  }
+
+  .cal-title-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 800;
+    color: #0f172a;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.12s ease;
+  }
+
+  .cal-title-btn:hover {
+    background: #e2e8f0;
+  }
+
+  .cal-month-totals {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .cal-total-pill {
+    font-size: 13px;
+    font-weight: 800;
+    padding: 5px 10px;
+    border-radius: 9px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cal-total-pill.snow {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+  }
+
+  .cal-total-pill.king {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+  }
+
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .cal-weekday {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 0;
+    border-radius: 7px;
+    background: #f8fafc;
+    color: #475569;
+  }
+
+  .cal-weekday.sun { color: #dc2626; background: #fef2f2; }
+  .cal-weekday.sat { color: #2563eb; background: #eff6ff; }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .cal-cell {
+    min-height: 78px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 6px 7px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    min-width: 0;
+  }
+
+  .cal-cell:hover {
+    border-color: #60a5fa;
+    background: #f8fafc;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+  }
+
+  .cal-cell.empty {
+    background: #f8fafc;
+    border-color: transparent;
+    cursor: default;
+    box-shadow: none;
+  }
+
+  .cal-cell.has-data {
+    background: #fafcff;
+    border-color: #cbd5e1;
+  }
+
+  .cal-day-num {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #334155;
+    line-height: 1.2;
+  }
+
+  .cal-day-num.sun { color: #dc2626; }
+  .cal-day-num.sat { color: #2563eb; }
+
+  .cal-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 4px;
+  }
+
+  .cal-badge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 5px;
+    border-radius: 5px;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cal-badge.snow {
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+
+  .cal-badge.king {
+    background: #fff7ed;
+    color: #c2410c;
+  }
+
+  .cal-empty-hint {
+    font-size: 10.5px;
+    color: #cbd5e1;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  /* 달력 연·월 빠른 점프 미리보기 팝업 */
+  .ym-picker-years {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .ym-year-chip {
+    padding: 7px 14px;
+    border-radius: 9px;
+    border: 1.5px solid var(--border);
+    background: #f8fafc;
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #334155;
+    cursor: pointer;
+  }
+
+  .ym-year-chip.active {
+    background: #0f172a;
+    border-color: #0f172a;
+    color: #ffffff;
+  }
+
+  .ym-months-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .ym-month-card {
+    border: 1.5px solid var(--border);
+    border-radius: 11px;
+    padding: 10px 8px;
+    background: #ffffff;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+
+  .ym-month-card:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+  }
+
+  .ym-month-card.active {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.16);
+  }
+
+  .ym-m-name {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  .ym-m-preview {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    margin-top: 3px;
+    font-variant-numeric: tabular-nums;
   }
 
   @media (max-width: 860px) {
-    .kpi-grid-3, .kpi-grid-2, .add-grid, .detail-grid, .daily-cols { grid-template-columns: 1fr; }
+    .kpi-grid-3, .kpi-grid-2, .add-grid, .detail-grid { grid-template-columns: 1fr; }
     .divider { display: none; }
     .quick-form { grid-template-columns: 1fr 1fr; }
-    .month-pill-grid { grid-template-columns: repeat(6, 1fr); }
   }
 
   /* ==================== 모바일 전용 UI 최적화 (768px 이하) ==================== */
@@ -1716,6 +2018,31 @@
     .quick-form button {
       grid-column: 1 / -1;
       padding: 10px;
+    }
+
+    .cal-weekdays, .cal-grid {
+      gap: 3px;
+    }
+    .cal-cell {
+      min-height: 66px;
+      padding: 4px 3px;
+      border-radius: 8px;
+    }
+    .cal-day-num {
+      font-size: 11px;
+    }
+    .cal-badge {
+      font-size: 9.5px;
+      padding: 1.5px 3px;
+      letter-spacing: -0.03em;
+    }
+    .cal-title-btn {
+      font-size: 15px;
+      padding: 5px 8px;
+    }
+    .cal-total-pill {
+      font-size: 11.5px;
+      padding: 4px 7px;
     }
 
     .std-table th, .std-table td {
@@ -2182,23 +2509,41 @@
 
       <div class="m-card">
         <div class="m-card-title">주문 및 원가 입력</div>
+        <div class="m-weight-bar">
+          <div class="m-weight-left">
+            <span style="font-size:13.5px; font-weight:800; color:#0f172a;">판매 중량</span>
+            <div class="m-input-wrap" style="width:125px;">
+              <input type="number" id="m_weight" value="1" min="0.1" step="0.1" style="background:#ffffff;">
+              <span class="unit">kg</span>
+            </div>
+          </div>
+          <div class="m-weight-chips">
+            <button type="button" class="m-w-chip" onclick="setMarginWeight(1)">1kg</button>
+            <button type="button" class="m-w-chip" onclick="setMarginWeight(1.5)">1.5kg</button>
+            <button type="button" class="m-w-chip" onclick="setMarginWeight(2)">2kg</button>
+            <button type="button" class="m-w-chip" onclick="setMarginWeight(3)">3kg</button>
+          </div>
+        </div>
         <div class="m-grid-3">
           <div class="m-field">
-            <label>매출액</label>
+            <label><span>판매가 (kg당)</span></label>
             <div class="m-input-wrap">
               <input type="number" id="m_sales" value="105000" min="0" step="1000">
               <span class="unit">원</span>
             </div>
           </div>
           <div class="m-field">
-            <label>식자재 원가</label>
+            <label>
+              <span>매입가 (kg당)</span>
+              <button type="button" class="m-water-btn" id="m_waterBtn" onclick="openWaterModal()">물치기 0%</button>
+            </label>
             <div class="m-input-wrap">
               <input type="number" id="m_cost" value="50000" min="0" step="1000">
               <span class="unit">원</span>
             </div>
           </div>
           <div class="m-field">
-            <label>포장비</label>
+            <label><span>포장비 (건당)</span></label>
             <div class="m-input-wrap">
               <input type="number" id="m_packaging" value="2000" min="0" step="500">
               <span class="unit">원</span>
@@ -2460,57 +2805,41 @@
         </div>
       </div>
 
+      <!-- 최상단 달력형 일별 판매량 뷰 -->
       <div class="l-card">
-        <div class="l-card-head">
-          <div class="l-card-title">월 선택 (버튼을 눌러 해당 월 일별 장부 보기)</div>
-        </div>
-        <div class="month-pill-grid" id="s_monthPills"></div>
-      </div>
-
-      <div class="l-card">
-        <div class="l-card-head">
-          <div class="l-card-title">일별 판매량 입력 / 수정</div>
-        </div>
-        <div class="quick-form">
-          <select id="s_inMonth"></select>
-          <select id="s_inDay"></select>
-          <div class="sales-input-box snow">
-            <input type="number" id="s_inSnow" placeholder="대게 중량 입력" min="0" step="0.01">
-            <span class="sales-input-unit">kg</span>
+        <div class="cal-header-bar">
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <div class="cal-nav-group">
+              <button type="button" class="cal-arrow-btn" id="s_calPrevBtn" title="이전 달">◀</button>
+              <button type="button" class="cal-title-btn" id="s_calTitleBtn" title="클릭하여 연도·월 빠른 이동">
+                <span id="s_calTitleText">2026년 11월</span>
+                <span style="font-size:12px; color:#64748b;">▼</span>
+              </button>
+              <button type="button" class="cal-arrow-btn" id="s_calNextBtn" title="다음 달">▶</button>
+            </div>
+            <div class="cal-month-totals" id="s_calMonthTotals">
+              <span class="cal-total-pill snow">대게 0.00kg</span>
+              <span class="cal-total-pill king">킹크랩 0.00kg</span>
+            </div>
           </div>
-          <div class="sales-input-box king">
-            <input type="number" id="s_inKing" placeholder="킹크랩 중량 입력" min="0" step="0.01">
-            <span class="sales-input-unit">kg</span>
-          </div>
-          <button class="l-btn l-btn-primary" id="s_saveDayBtn">저장</button>
+          <div style="font-size:12px; color:#64748b;" id="s_dailyNotice">날짜 칸을 누르면 바로 수정됩니다</div>
         </div>
+        <div class="cal-weekdays">
+          <div class="cal-weekday sun">일</div>
+          <div class="cal-weekday">월</div>
+          <div class="cal-weekday">화</div>
+          <div class="cal-weekday">수</div>
+          <div class="cal-weekday">목</div>
+          <div class="cal-weekday">금</div>
+          <div class="cal-weekday sat">토</div>
+        </div>
+        <div class="cal-grid" id="s_calendarGrid"></div>
       </div>
 
+      <!-- 월별 총 판매량 요약 -->
       <div class="l-card">
         <div class="l-card-head">
-          <div class="l-card-title">월별 판매량 추이 (대게 + 킹크랩 vs 작년 동월)</div>
-          <div class="legend">
-            <span><i class="dot" style="background:var(--snow-blue)"></i>대게</span>
-            <span><i class="dot" style="background:var(--king-orange)"></i>킹크랩</span>
-            <span><i class="dot" style="background:var(--prev)"></i>작년 동월</span>
-          </div>
-        </div>
-        <div class="chart-wrap">
-          <div class="bars" id="s_chartBars"></div>
-        </div>
-      </div>
-
-      <div class="l-card">
-        <div class="l-card-head">
-          <div class="l-card-title" id="s_dailyTitle">1월 일별 판매량 (셀 클릭 시 수정)</div>
-          <div style="font-size:12.5px; color:#64748b;" id="s_dailyNotice"></div>
-        </div>
-        <div class="daily-cols" id="s_dailyCols"></div>
-      </div>
-
-      <div class="l-card">
-        <div class="l-card-head">
-          <div class="l-card-title">월별 총 판매량 요약</div>
+          <div class="l-card-title">월별 총 판매량 요약 (클릭 시 위 달력 이동)</div>
         </div>
         <div class="l-table-wrap">
           <table class="l-table">
@@ -2527,6 +2856,65 @@
             <tbody id="s_summaryBody"></tbody>
           </table>
         </div>
+      </div>
+
+      <div class="l-card">
+        <div class="l-card-head">
+          <div class="l-card-title">월별 판매량 추이 (대게 + 킹크랩 vs 작년 동월)</div>
+          <div class="legend">
+            <span><i class="dot" style="background:var(--snow-blue)"></i>대게</span>
+            <span><i class="dot" style="background:var(--king-orange)"></i>킹크랩</span>
+            <span><i class="dot" style="background:var(--prev)"></i>작년 동월</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <div class="bars" id="s_chartBars"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 달력 연도·월 빠른 이동 모달 ==================== -->
+  <div class="modal-backdrop" id="ym-picker-backdrop" onclick="if(event.target===this) closeYmPicker()">
+    <div class="modal sm-modal" role="dialog" aria-modal="true" style="max-width:440px;">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">연도 · 월 빠른 이동</div>
+          <div class="modal-sub">이동할 연도와 월을 선택하세요 (월별 총 판매량 미리보기)</div>
+        </div>
+        <button class="p-icon-btn" onclick="closeYmPicker()" title="닫기">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding-top:14px;">
+        <div class="ym-picker-years" id="ymPickerYears"></div>
+        <div class="ym-months-grid" id="ymPickerMonths"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 물치기 비율 선택 모달 ==================== -->
+  <div class="modal-backdrop" id="water-modal-backdrop" onclick="if(event.target===this) closeWaterModal()">
+    <div class="modal sm-modal" role="dialog" aria-modal="true" style="max-width:400px;">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">물치기 비율 선택</div>
+          <div class="modal-sub">선택한 비율만큼 매입 원가가 자동 차감됩니다</div>
+        </div>
+        <button class="p-icon-btn" onclick="closeWaterModal()" title="닫기">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" style="padding-top:14px;">
+        <div class="water-opt-list" id="waterOptList"></div>
+      </div>
+      <div class="modal-footer" style="justify-content:flex-end;">
+        <button type="button" class="btn" onclick="closeWaterModal()">취소</button>
+        <button type="button" class="btn btn-primary" onclick="confirmWaterSelection()">확인</button>
       </div>
     </div>
   </div>
@@ -2631,28 +3019,49 @@
      Netlify 자동 삽입 위젯(Powered by Netlify / Build your own site) 강제 제거
      ========================================================================= */
   (function stripNetlifyBadge() {
+    const isAppNode = (el) => {
+      if (!el || el === document.body || el === document.documentElement) return true;
+      if (el.id === 'lockScreen' || el.id === 'toast') return true;
+      if (el.closest('#lockScreen, .global-header, .tab-panel, .modal-backdrop, #toast')) return true;
+      if (el.classList && (el.classList.contains('global-header') || el.classList.contains('tab-panel') || el.classList.contains('modal-backdrop'))) return true;
+      return false;
+    };
+
     const removeWidgets = () => {
-      document.querySelectorAll('iframe, div, aside, a, section').forEach((el) => {
-        if (el.id === 'lockScreen' || el.closest('#lockScreen') || el.closest('.global-header') || el.closest('.tab-panel') || el.closest('.modal-backdrop')) return;
+      document.querySelectorAll('iframe, div, aside, a, section, span').forEach((el) => {
+        if (isAppNode(el)) return;
         const src = (el.getAttribute('src') || '').toLowerCase();
+        const href = (el.getAttribute('href') || '').toLowerCase();
         const id = (el.id || '').toLowerCase();
         const cls = (typeof el.className === 'string' ? el.className : '').toLowerCase();
-        const txt = (el.textContent || '').trim();
+        const txt = (el.textContent || '').toLowerCase();
+        const style = window.getComputedStyle(el);
+        const isFixedBottom = style.position === 'fixed' && (parseInt(style.bottom, 10) <= 40 || style.bottom === '0px');
+
         if (
           src.includes('netlify') ||
+          href.includes('netlify') ||
           id.includes('netlify') ||
           cls.includes('netlify') ||
-          txt.includes('Powered by Netlify') ||
-          txt.includes('Build your own site with Netlify')
+          txt.includes('powered by netlify') ||
+          txt.includes('build your own site') ||
+          (isFixedBottom && !el.closest('#lockScreen, .global-header, .modal-backdrop, #toast'))
         ) {
           el.remove();
         }
       });
+
+      Array.from(document.body.children).forEach((child) => {
+        if (!isAppNode(child) && child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE') {
+          child.remove();
+        }
+      });
     };
+
     removeWidgets();
     const obs = new MutationObserver(() => removeWidgets());
     obs.observe(document.documentElement, { childList: true, subtree: true });
-    setInterval(removeWidgets, 800);
+    setInterval(removeWidgets, 500);
   })();
 
   /* =========================================================================
@@ -3014,6 +3423,8 @@
   };
 
   const DEFAULT_MARGIN_STATE = {
+    weight: 1,
+    waterPct: 0,
     sales: 105000,
     cost: 50000,
     packaging: 2000,
@@ -3744,15 +4155,83 @@
   /* =========================================================================
      TAB 2: 마진계산 로직
      ========================================================================= */
-  const MARGIN_FIELDS = ["sales", "cost", "packaging", "cpCoupon", "bmCoupon", "cpBrokerage", "cpPg", "cpDelivery", "bmBrokerage", "bmPg", "bmDelivery"];
+  const MARGIN_FIELDS = ["weight", "sales", "cost", "packaging", "cpCoupon", "bmCoupon", "cpBrokerage", "cpPg", "cpDelivery", "bmBrokerage", "bmPg", "bmDelivery"];
 
   function applyMarginStateToInputs() {
+    if (marginState.weight === undefined) marginState.weight = 1;
+    if (marginState.waterPct === undefined) marginState.waterPct = 0;
     MARGIN_FIELDS.forEach(f => {
       const el = document.getElementById(`m_${f}`);
       if (el) el.value = marginState[f];
     });
+    updateWaterBtnUI();
     updateMarginView();
   }
+
+  function updateWaterBtnUI() {
+    const btn = document.getElementById("m_waterBtn");
+    if (!btn) return;
+    const pct = Number(marginState.waterPct) || 0;
+    btn.textContent = pct > 0 ? `물치기 ${pct}% 적용` : "물치기 0%";
+    btn.classList.toggle("active", pct > 0);
+  }
+
+  window.setMarginWeight = (w) => {
+    marginState.weight = w;
+    const el = document.getElementById("m_weight");
+    if (el) el.value = w;
+    scheduleCloudSave("margin", marginState);
+    updateMarginView();
+  };
+
+  let tempWaterPct = 0;
+  const WATER_OPTIONS = [
+    { pct: 0, label: "0%", desc: "적용 안함 (×1.00)" },
+    { pct: 10, label: "10%", desc: "10% 차감 (×0.90)" },
+    { pct: 15, label: "15%", desc: "15% 차감 (×0.85)" },
+    { pct: 20, label: "20%", desc: "20% 차감 (×0.80)" }
+  ];
+
+  function renderWaterOptions() {
+    const list = document.getElementById("waterOptList");
+    if (!list) return;
+    list.innerHTML = WATER_OPTIONS.map(opt => {
+      const isSel = tempWaterPct === opt.pct;
+      return `
+        <div class="water-opt-item ${isSel ? "selected" : ""}" onclick="selectTempWater(${opt.pct})">
+          <div>
+            <div>${opt.label}</div>
+            <div style="font-size:11px; font-weight:600; color:#64748b; margin-top:2px;">${opt.desc}</div>
+          </div>
+          <span style="font-size:16px;">${isSel ? "☑" : "☐"}</span>
+        </div>
+      `;
+    }).join("");
+  }
+
+  window.openWaterModal = () => {
+    tempWaterPct = Number(marginState.waterPct) || 0;
+    renderWaterOptions();
+    document.getElementById("water-modal-backdrop").classList.add("open");
+  };
+
+  window.closeWaterModal = () => {
+    document.getElementById("water-modal-backdrop").classList.remove("open");
+  };
+
+  window.selectTempWater = (pct) => {
+    tempWaterPct = pct;
+    renderWaterOptions();
+  };
+
+  window.confirmWaterSelection = () => {
+    marginState.waterPct = tempWaterPct;
+    updateWaterBtnUI();
+    scheduleCloudSave("margin", marginState);
+    updateMarginView();
+    closeWaterModal();
+    showToast(tempWaterPct > 0 ? `물치기 ${tempWaterPct}% (×${((100 - tempWaterPct) / 100).toFixed(2)}) 적용됨` : "물치기 해제됨 (0%)");
+  };
 
   document.getElementById("m_toggleSettings").addEventListener("click", () => {
     const body = document.getElementById("m_settingsBody");
@@ -3788,10 +4267,18 @@
   }
 
   function updateMarginView() {
-    const won = (v) => v.toLocaleString("ko-KR") + "원";
+    const won = (v) => Math.round(v).toLocaleString("ko-KR") + "원";
     const s = marginState;
-    const cp = calcPlatformMargin(s.sales, s.cpCoupon, s.cost, s.packaging, s.cpBrokerage, s.cpPg, s.cpDelivery, false);
-    const bm = calcPlatformMargin(s.sales, s.bmCoupon, s.cost, s.packaging, s.bmBrokerage, s.bmPg, s.bmDelivery, true);
+    const weight = Math.max(0, Number(s.weight) || 0);
+    const waterPct = Math.max(0, Number(s.waterPct) || 0);
+    const waterFactor = (100 - waterPct) / 100;
+
+    const totalSales = Math.round(s.sales * weight);
+    const rawTotalCost = Math.round(s.cost * weight);
+    const effectiveCost = Math.round(rawTotalCost * waterFactor);
+
+    const cp = calcPlatformMargin(totalSales, s.cpCoupon, effectiveCost, s.packaging, s.cpBrokerage, s.cpPg, s.cpDelivery, false);
+    const bm = calcPlatformMargin(totalSales, s.bmCoupon, effectiveCost, s.packaging, s.bmBrokerage, s.bmPg, s.bmDelivery, true);
 
     const diff = bm.netProfit - cp.netProfit;
     const banner = document.getElementById("m_banner");
@@ -3809,15 +4296,19 @@
     renderMarginBar(document.getElementById("m_cpBar"), cp);
     renderMarginBar(document.getElementById("m_bmBar"), bm);
 
+    const costRowLabel = waterPct > 0
+      ? `매입 원가 (물치기 ${waterPct}% 적용) + 포장비`
+      : `매입 원가 (${weight}kg) + 포장비`;
+
     const rows = [
-      ["매출액", won(cp.sales), won(bm.sales), ""],
+      [`총 매출액 (${weight}kg × ${s.sales.toLocaleString("ko-KR")}원)`, won(cp.sales), won(bm.sales), ""],
       ["상점부담 쿠폰할인", won(-cp.coupon), won(-bm.coupon), ""],
       ["중개이용료", won(-cp.brokerage), won(-bm.brokerage), ""],
       ["결제수수료", won(-cp.pg), won(-bm.pg), ""],
       ["배달비", won(-cp.delivery), won(-bm.delivery), ""],
       ["부가세", won(-cp.vat), won(-bm.vat), ""],
       ["정산예정금액", won(cp.settlement), won(bm.settlement), "row-sub"],
-      ["원가 + 포장비", won(-cp.totalCost), won(-bm.totalCost), ""],
+      [costRowLabel, won(-cp.totalCost), won(-bm.totalCost), ""],
       ["순수익", won(cp.netProfit), won(bm.netProfit), "row-profit", true],
       ["원가율 (%)", cp.costRate.toFixed(2) + "%", bm.costRate.toFixed(2) + "%", "row-costrate"],
       ["마진율 (%)", cp.marginRate.toFixed(2) + "%", bm.marginRate.toFixed(2) + "%", "row-margin", true]
@@ -4089,7 +4580,7 @@
   });
 
   /* =========================================================================
-     TAB 4: 연간총판매 로직
+     TAB 4: 연간총판매 로직 (달력형 뷰 + 연·월 빠른 이동 팝업)
      ========================================================================= */
   let salesYear = "2026";
   let salesMonth = 11;
@@ -4113,35 +4604,10 @@
     return { s: 0, k: 0, total: 0, hasDaily: false };
   }
 
-  function updateSalesDaySelect() {
-    const y = Number(salesYear);
-    const m = Number(document.getElementById("s_inMonth").value);
-    const maxD = daysInMonth(y, m);
-    const prevD = Math.min(Number(document.getElementById("s_inDay").value) || 1, maxD);
-    document.getElementById("s_inDay").innerHTML = Array.from({ length: maxD }, (_, i) => `<option value="${i + 1}">${i + 1}일</option>`).join("");
-    document.getElementById("s_inDay").value = prevD;
-    updateSalesInputPlaceholders();
-  }
-
-  function updateSalesInputPlaceholders() {
-    const m = Number(document.getElementById("s_inMonth").value);
-    const d = Number(document.getElementById("s_inDay").value);
-    const rec = (salesDB[salesYear] && salesDB[salesYear][m] && salesDB[salesYear][m].days[d]) || { s: 0, k: 0 };
-    const sInp = document.getElementById("s_inSnow");
-    const kInp = document.getElementById("s_inKing");
-    if (sInp) sInp.placeholder = rec.s > 0 ? `현재 ${rec.s.toFixed(2)}kg (새 중량 입력)` : "대게 중량 입력";
-    if (kInp) kInp.placeholder = rec.k > 0 ? `현재 ${rec.k.toFixed(2)}kg (새 중량 입력)` : "킹크랩 중량 입력";
-  }
-
   function renderSales() {
     const years = Object.keys(salesDB).sort((a, b) => Number(b) - Number(a));
     if (!salesDB[salesYear]) salesYear = years[0];
     document.getElementById("s_yearSelect").innerHTML = years.map(y => `<option value="${y}" ${y === salesYear ? "selected" : ""}>${y}년</option>`).join("");
-
-    document.getElementById("s_monthPills").innerHTML = Array.from({ length: 12 }, (_, i) => {
-      const m = i + 1;
-      return `<button type="button" class="month-pill-btn ${m === salesMonth ? "active" : ""}" onclick="selectSalesMonth(${m})">${m}월</button>`;
-    }).join("");
 
     const prevYear = String(Number(salesYear) - 1);
     const hasPrevYear = Boolean(salesDB[prevYear]);
@@ -4224,96 +4690,160 @@
       `;
     }).join("");
 
-    const maxD = daysInMonth(Number(salesYear), salesMonth);
+    // 달력형 일별 판매량 렌더링
+    const yNum = Number(salesYear);
+    const maxD = daysInMonth(yNum, salesMonth);
+    const firstWeekday = new Date(yNum, salesMonth - 1, 1).getDay();
     const mObj = salesDB[salesYear][salesMonth];
     const mTot = getMonthSalesTotals(salesYear, salesMonth);
-    document.getElementById("s_dailyTitle").textContent = `${salesYear}년 ${salesMonth}월 일별 판매량 (1~${maxD}일 · 셀 클릭 시 수정)`;
-    document.getElementById("s_dailyNotice").textContent = (!mTot.hasDaily && mObj.fallback)
-      ? `일별 미입력 상태 (월 합계 대게 ${fmtKg(mObj.fallback.s)} / 킹크랩 ${fmtKg(mObj.fallback.k)} 반영 중)`
-      : "";
 
-    const ranges = [[1, 10], [11, 20], [21, maxD]];
-    document.getElementById("s_dailyCols").innerHTML = ranges.map(([start, end]) => {
-      let body = "";
-      for (let d = start; d <= end; d++) {
-        const rec = mObj.days[d] || { s: 0, k: 0 };
-        const sTxt = rec.s > 0 ? rec.s.toFixed(2) + "kg" : "";
-        const kTxt = rec.k > 0 ? rec.k.toFixed(2) + "kg" : "";
-        body += `
-          <tr>
-            <td class="day-cell">${d}일</td>
-            <td class="edit-cell c-snow ${rec.s > 0 ? "" : "empty-slot"}" onclick="editSalesCell(${d}, 's')">${sTxt}</td>
-            <td class="edit-cell c-king ${rec.k > 0 ? "" : "empty-slot"}" onclick="editSalesCell(${d}, 'k')">${kTxt}</td>
-          </tr>
-        `;
-      }
-      return `
-        <table class="daily-table">
-          <thead><tr><th>일자</th><th style="color:var(--snow-blue)">대게</th><th style="color:var(--king-orange)">킹크랩</th></tr></thead>
-          <tbody>${body}</tbody>
-        </table>
+    document.getElementById("s_calTitleText").textContent = `${salesYear}년 ${salesMonth}월`;
+    document.getElementById("s_calMonthTotals").innerHTML = `
+      <span class="cal-total-pill snow">대게 ${fmtKg(mTot.s)}</span>
+      <span class="cal-total-pill king">킹크랩 ${fmtKg(mTot.k)}</span>
+    `;
+    document.getElementById("s_dailyNotice").textContent = (!mTot.hasDaily && mObj.fallback)
+      ? "월 합계만 등록된 달입니다 · 날짜 칸 클릭 시 일별 입력"
+      : "날짜 칸을 누르면 바로 수정됩니다";
+
+    let calCellsHtml = "";
+    for (let i = 0; i < firstWeekday; i++) {
+      calCellsHtml += `<div class="cal-cell empty"></div>`;
+    }
+    for (let d = 1; d <= maxD; d++) {
+      const rec = mObj.days[d] || { s: 0, k: 0 };
+      const dow = (firstWeekday + d - 1) % 7;
+      const dayCls = dow === 0 ? "sun" : (dow === 6 ? "sat" : "");
+      const hasData = (rec.s > 0 || rec.k > 0);
+      const badgesHtml = hasData
+        ? `<div class="cal-badges">
+            ${rec.s > 0 ? `<div class="cal-badge snow">대 ${rec.s.toFixed(1)}</div>` : ""}
+            ${rec.k > 0 ? `<div class="cal-badge king">킹 ${rec.k.toFixed(1)}</div>` : ""}
+           </div>`
+        : `<div class="cal-empty-hint">+</div>`;
+
+      calCellsHtml += `
+        <div class="cal-cell ${hasData ? "has-data" : ""}" onclick="openCalendarDayEdit(${d})" title="${salesMonth}월 ${d}일 대게 ${rec.s.toFixed(2)}kg / 킹크랩 ${rec.k.toFixed(2)}kg">
+          <div class="cal-day-num ${dayCls}">${d}</div>
+          ${badgesHtml}
+        </div>
       `;
-    }).join("");
+    }
+    document.getElementById("s_calendarGrid").innerHTML = calCellsHtml;
   }
 
   window.selectSalesMonth = (m) => {
     salesMonth = m;
-    document.getElementById("s_inMonth").value = m;
-    updateSalesDaySelect();
     preserveScrollRender(renderSales);
   };
 
-  window.editSalesCell = (day, field) => {
+  window.openCalendarDayEdit = (day) => {
     const mObj = salesDB[salesYear][salesMonth];
     const cur = mObj.days[day] || { s: 0, k: 0 };
-    const label = field === "s" ? "대게 (kg)" : "킹크랩 (kg)";
-    promptAction(`${salesYear}년 ${salesMonth}월 ${day}일 ${label}`, "판매 중량(kg)을 입력하세요. (비우면 0kg)", cur[field] > 0 ? cur[field] : "", (val) => {
-      const num = val.trim() === "" ? 0 : parseFloat(val);
-      if (isNaN(num) || num < 0) return;
-      if (!mObj.days[day]) mObj.days[day] = { s: 0, k: 0 };
-      mObj.days[day][field] = Math.round(num * 100) / 100;
-      scheduleCloudSave("sales", salesDB);
-      preserveScrollRender(renderSales);
-    });
+
+    promptAction(
+      `${salesYear}년 ${salesMonth}월 ${day}일 판매량 수정`,
+      "대게, 킹크랩 순서로 입력하세요 (예: 12.5, 4.2 또는 대게만 입력 시 12.5)",
+      `${cur.s > 0 ? cur.s : 0}, ${cur.k > 0 ? cur.k : 0}`,
+      (val) => {
+        const parts = val.split(/[,/\s]+/).filter(Boolean);
+        const sVal = parts[0] !== undefined ? parseFloat(parts[0]) : 0;
+        const kVal = parts[1] !== undefined ? parseFloat(parts[1]) : 0;
+        if (isNaN(sVal) || sVal < 0 || isNaN(kVal) || kVal < 0) return;
+        if (!mObj.days[day]) mObj.days[day] = { s: 0, k: 0 };
+        mObj.days[day].s = Math.round(sVal * 100) / 100;
+        mObj.days[day].k = Math.round(kVal * 100) / 100;
+        scheduleCloudSave("sales", salesDB);
+        preserveScrollRender(renderSales);
+        showToast(`${salesMonth}월 ${day}일 판매량이 저장되었습니다`);
+      }
+    );
   };
 
-  document.getElementById("s_saveDayBtn").addEventListener("click", () => {
-    const m = Number(document.getElementById("s_inMonth").value);
-    const d = Number(document.getElementById("s_inDay").value);
-    const s = parseFloat(document.getElementById("s_inSnow").value) || 0;
-    const k = parseFloat(document.getElementById("s_inKing").value) || 0;
-    salesDB[salesYear][m].days[d] = { s: Math.round(s * 100) / 100, k: Math.round(k * 100) / 100 };
-    document.getElementById("s_inSnow").value = "";
-    document.getElementById("s_inKing").value = "";
+  function shiftSalesCalendarMonth(delta) {
+    let y = Number(salesYear);
+    let m = salesMonth + delta;
+    if (m < 1) {
+      if (salesDB[String(y - 1)]) {
+        y -= 1;
+        m = 12;
+      } else {
+        m = 1;
+        showToast(`${y}년 1월이 첫 달입니다`);
+      }
+    } else if (m > 12) {
+      if (salesDB[String(y + 1)]) {
+        y += 1;
+        m = 1;
+      } else {
+        m = 12;
+        showToast(`${y}년 12월이 마지막 달입니다`);
+      }
+    }
+    salesYear = String(y);
     salesMonth = m;
-    scheduleCloudSave("sales", salesDB);
     preserveScrollRender(renderSales);
-    updateSalesInputPlaceholders();
-    showToast(`${m}월 ${d}일 판매량이 저장되었습니다`);
-  });
+  }
 
-  document.getElementById("s_inSnow").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") { e.preventDefault(); document.getElementById("s_saveDayBtn").click(); }
-  });
-  document.getElementById("s_inKing").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") { e.preventDefault(); document.getElementById("s_saveDayBtn").click(); }
-  });
-  document.getElementById("s_inDay").addEventListener("change", updateSalesInputPlaceholders);
+  document.getElementById("s_calPrevBtn").addEventListener("click", () => shiftSalesCalendarMonth(-1));
+  document.getElementById("s_calNextBtn").addEventListener("click", () => shiftSalesCalendarMonth(1));
 
-  document.getElementById("s_inMonth").addEventListener("change", () => {
-    salesMonth = Number(document.getElementById("s_inMonth").value);
-    updateSalesDaySelect();
+  /* ==================== 달력 연·월 빠른 이동 미리보기 팝업 ==================== */
+  let ymPreviewYear = "2026";
+
+  function renderYmPickerModal() {
+    const years = Object.keys(salesDB).sort((a, b) => Number(b) - Number(a));
+    if (!salesDB[ymPreviewYear]) ymPreviewYear = salesYear;
+
+    document.getElementById("ymPickerYears").innerHTML = years.map(y => `
+      <button type="button" class="ym-year-chip ${y === ymPreviewYear ? "active" : ""}" onclick="selectYmPreviewYear('${y}')">${y}년</button>
+    `).join("");
+
+    document.getElementById("ymPickerMonths").innerHTML = Array.from({ length: 12 }, (_, i) => {
+      const m = i + 1;
+      const tot = getMonthSalesTotals(ymPreviewYear, m);
+      const isSelected = (ymPreviewYear === salesYear && m === salesMonth);
+      return `
+        <button type="button" class="ym-month-card ${isSelected ? "active" : ""}" onclick="jumpToYearMonth('${ymPreviewYear}', ${m})">
+          <div class="ym-m-name">${m}월</div>
+          <div class="ym-m-preview">${tot.total > 0 ? tot.total.toFixed(1) + "kg" : "기록 없음"}</div>
+        </button>
+      `;
+    }).join("");
+  }
+
+  window.openYmPicker = () => {
+    ymPreviewYear = salesYear;
+    renderYmPickerModal();
+    document.getElementById("ym-picker-backdrop").classList.add("open");
+  };
+
+  window.closeYmPicker = () => {
+    document.getElementById("ym-picker-backdrop").classList.remove("open");
+  };
+
+  window.selectYmPreviewYear = (y) => {
+    ymPreviewYear = y;
+    renderYmPickerModal();
+  };
+
+  window.jumpToYearMonth = (y, m) => {
+    salesYear = y;
+    salesMonth = m;
+    closeYmPicker();
     preserveScrollRender(renderSales);
-  });
+  };
+
+  document.getElementById("s_calTitleBtn").addEventListener("click", openYmPicker);
 
   function stepSalesYear(delta) {
     const years = Object.keys(salesDB).sort((a, b) => Number(b) - Number(a));
     const idx = years.indexOf(salesYear);
     const nextIdx = Math.min(years.length - 1, Math.max(0, idx + delta));
-    if (nextIdx !== idx) { salesYear = years[nextIdx]; updateSalesDaySelect(); renderSales(); }
+    if (nextIdx !== idx) { salesYear = years[nextIdx]; renderSales(); }
   }
 
-  document.getElementById("s_yearSelect").addEventListener("change", (e) => { salesYear = e.target.value; updateSalesDaySelect(); renderSales(); });
+  document.getElementById("s_yearSelect").addEventListener("change", (e) => { salesYear = e.target.value; renderSales(); });
   document.getElementById("s_yearUp").addEventListener("click", () => stepSalesYear(-1));
   document.getElementById("s_yearDown").addEventListener("click", () => stepSalesYear(1));
   document.getElementById("s_yearPicker").addEventListener("wheel", (e) => { e.preventDefault(); stepSalesYear(e.deltaY > 0 ? 1 : -1); }, { passive: false });
@@ -4323,7 +4853,6 @@
     const nextY = String(maxYear + 1);
     salesDB[nextY] = makeEmptySalesYear();
     salesYear = nextY;
-    updateSalesDaySelect();
     scheduleCloudSave("sales", salesDB);
     renderSales();
     showToast(`${nextY}년 판매량 장부가 추가되었습니다`);
@@ -4335,7 +4864,6 @@
     confirmAction(`${salesYear}년 판매량 데이터를 삭제할까요?`, "삭제된 연도의 일별·월별 판매 기록은 복구할 수 없습니다.", () => {
       delete salesDB[salesYear];
       salesYear = Object.keys(salesDB).sort((a, b) => Number(b) - Number(a))[0];
-      updateSalesDaySelect();
       scheduleCloudSave("sales", salesDB);
       renderSales();
     });
@@ -4374,15 +4902,13 @@
   document.getElementById("l_buyMonth").value = ledgerMonth;
   document.getElementById("l_payMonth").value = ledgerMonth;
 
-  document.getElementById("s_inMonth").innerHTML = monthOpts;
-  document.getElementById("s_inMonth").value = salesMonth;
-  updateSalesDaySelect();
-
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeCountModal();
       closeCustomDialog();
       closeChangePwdModal();
+      closeYmPicker();
+      closeWaterModal();
     }
   });
 
